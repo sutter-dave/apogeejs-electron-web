@@ -1,4 +1,5 @@
-import {BaseFileAccess} from "./lib/apogeeAppLib.es.js";
+import {apogeeapp} from "./lib/apogeeAppBundle.es.js";
+const BaseFileAccess = apogeeapp.BaseFileAccess;
 
 /* 
  * This class provides file open and save in electron.
