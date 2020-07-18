@@ -10930,7 +10930,7 @@ function deleteMember(model,actionData) {
         return actionResult;
     }
     
-    let actionResult = doDelete$1(model, member);
+    let actionResult = doDelete(model, member);
 
     //remove the top-most deleted member from its parent
     let parentId = member.getParentId();
@@ -10947,7 +10947,7 @@ function deleteMember(model,actionData) {
 /** Here we take any actions for deleting the member and its children,
  * except "remove from parent", which we will do only for the top deleted member. 
  * @private */
-function doDelete$1(model, member) {
+function doDelete(model, member) {
 
     let actionResult = {};
     actionResult.member = member;
@@ -10963,7 +10963,7 @@ function doDelete$1(model, member) {
             let childId = childIdMap[childName];
             let child = model.lookupMemberById(childId);
             if(child) {
-                let childActionResult = doDelete$1(model, child);
+                let childActionResult = doDelete(model, child);
                 actionResult.childActionResults.push(childActionResult);
             }
         }
@@ -53590,57 +53590,6 @@ let lineFunctions = {
     
 };
 
-/** This dialog has a message and a number of buttons and associated actions. */
-function showSimpleActionDialog(msg,buttonTextList,buttonActionList) {
-
-    var dialog = dialogMgr.createDialog({"movable":true});
-    
-    //add a scroll container
-    var contentContainer = uiutil.createElement("div",null,
-        {
-			"display":"block",
-            "position":"relative",
-            "top":"0px",
-            "height":"100%",
-            "overflow": "auto"
-        });
-	dialog.setContent(contentContainer,uiutil.SIZE_WINDOW_TO_CONTENT);
-    
-	var content = uiutil.createElement("div",null,
-			{
-				"display":"table",
-				"overflow":"hidden"
-			});
-	contentContainer.appendChild(content);
-    
-    var line;
-  
-    //title
-    line = uiutil.createElement("div",{"className":"dialogLine"});
-    line.appendChild(uiutil.createElement("div",{"className":"dialogTitle","innerHTML":msg}));
-    content.appendChild(line);
-    
-    //buttons
-    line = uiutil.createElement("div",{"className":"dialogLine"});
-    for(let i = 0; i < buttonTextList.length; i++) {
-        let buttonLabel = buttonTextList[i];
-        let buttonAction = () => {
-            buttonActionList[i]();
-            dialogMgr.closeDialog(dialog);
-        };
-        line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":buttonLabel,"onclick":buttonAction}));
-        content.appendChild(line);
-    }
-    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);  
-    
-    //show dialog
-    dialogMgr.showDialog(dialog);
-    
-    //size the dialog to the content
-    dialog.fitToContent();
-    dialog.centerInParent();
-}
-
 //=====================================
 // UI Entry Point
 //=====================================
@@ -53677,8 +53626,6 @@ function updateComponent(componentView) {
             }
         }
         
-        let commandsDeleteComponent = false;
-        let deleteMsg;
         var commands = [];
         
         //--------------
@@ -53786,9 +53733,9 @@ function updateComponent(componentView) {
                         if(newParentCommands.editorSetupCommand) commands.push(newParentCommands.editorSetupCommand);
                         //check if we need to add any delete component commands  - we shouldn't have any since we are not overwriting data here
                         if(newParentCommands.deletedComponentCommands) {
-                            //flag a delete will be done
-                            commandsDeleteComponent = true;
-                            deleteMsg = "Are you sure you want to delete these apogee nodes: " + deletedComponentNames + "?";
+                            //make sure the user wants to proceed
+                            let deletedComponentNames = newParentCommands.deletedComponentCommands.map(command => command.memberId);
+                            let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + deletedComponentNames);
                             
                             //return if user rejects
                             if(!doDelete) return;
@@ -53836,26 +53783,12 @@ function updateComponent(componentView) {
             command = commands[0];
         }
         
-        //command action
-        let doAction = () => {
-            if(command) {   
-                modelManager.getApp().executeCommand(command);
-            }
-
-            returnToEditor(componentView,submittedValues.name);
-        };
-
-        if(commandsDeleteComponent) {
-            //if there is a delete, verify the user wants to do this
-            let cancelAction = () => {
-                returnToEditor(componentView,submittedValues.name);
-            };
-            showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+        //execute command
+        if(command) {   
+            modelManager.getApp().executeCommand(command);
         }
-        else {
-            //otherwise just take the action
-            doAction();
-        }
+
+        returnToEditor(componentView,submittedValues.name);
 
         //return true to close the dialog
         return true;
@@ -54016,6 +53949,57 @@ function showSelectComponentDialog(componentInfoList,onSelectFunction) {
     dialog.centerInParent();
 }
 
+/** This dialog has a message and a number of buttons and associated actions. */
+function showSimpleActionDialog(msg,buttonTextList,buttonActionList) {
+
+    var dialog = dialogMgr.createDialog({"movable":true});
+    
+    //add a scroll container
+    var contentContainer = uiutil.createElement("div",null,
+        {
+			"display":"block",
+            "position":"relative",
+            "top":"0px",
+            "height":"100%",
+            "overflow": "auto"
+        });
+	dialog.setContent(contentContainer,uiutil.SIZE_WINDOW_TO_CONTENT);
+    
+	var content = uiutil.createElement("div",null,
+			{
+				"display":"table",
+				"overflow":"hidden"
+			});
+	contentContainer.appendChild(content);
+    
+    var line;
+  
+    //title
+    line = uiutil.createElement("div",{"className":"dialogLine"});
+    line.appendChild(uiutil.createElement("div",{"className":"dialogTitle","innerHTML":msg}));
+    content.appendChild(line);
+    
+    //buttons
+    line = uiutil.createElement("div",{"className":"dialogLine"});
+    for(let i = 0; i < buttonTextList.length; i++) {
+        let buttonLabel = buttonTextList[i];
+        let buttonAction = () => {
+            buttonActionList[i]();
+            dialogMgr.closeDialog(dialog);
+        };
+        line.appendChild(uiutil.createElement("button",{"className":"dialogButton","innerHTML":buttonLabel,"onclick":buttonAction}));
+        content.appendChild(line);
+    }
+    dialog.setContent(content,uiutil.SIZE_WINDOW_TO_CONTENT);  
+    
+    //show dialog
+    dialogMgr.showDialog(dialog);
+    
+    //size the dialog to the content
+    dialog.fitToContent();
+    dialog.centerInParent();
+}
+
 /** This module initializes the default component view classes. */
 let componentViewClassMap = {};
 
@@ -54126,7 +54110,7 @@ function addComponent(appView,app,componentClass,optionalInitialProperties,optio
                     if(additionalCommandInfo.deletedComponentCommands){
                         //flag a delete will be done
                         commandsDeleteComponent = true;
-                        deleteMsg = "Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames + "?";
+                        deleteMsg = "Are you sure you want to delete these apogee nodes: " + additionalCommandInfo.deletedComponentShortNames;
 
                         commands.push(...additionalCommandInfo.deletedComponentCommands);
                     } 
@@ -54167,13 +54151,8 @@ function addComponent(appView,app,componentClass,optionalInitialProperties,optio
 
             if(commandsDeleteComponent) {
                 //if there is a delete, verify the user wants to do this
-                let cancelAction = () => {
-                    //give focus back to editor
-                    if(parentComponentView) {
-                        parentComponentView.giveEditorFocusIfShowing();
-                    }
-                };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
+                let noop = () => true;
+                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,noop]);
             }
             else {
                 //otherwise just take the action
@@ -56609,25 +56588,10 @@ class ApogeeWebView {
 
 function deleteComponent(componentView) {
 
-    let doDelete = () => {
-        deleteComponentImpl(componentView);
-        returnToEditor$1(componentView);
-    };
-
-    let doCancel = () => {
-        returnToEditor$1(componentView);
-    };
-    showSimpleActionDialog("Are you sure you want to delete this object:" + componentView.getName() + "?",["OK","Cancel"],[doDelete,doCancel]);
-}
-
-function returnToEditor$1(componentView) {
-    let parentComponentView = componentView.getParentComponentView();
-    if(parentComponentView) {
-        parentComponentView.giveEditorFocusIfShowing();
+    var doDelete = confirm("Are you sure you want to delete this object?");
+    if(!doDelete) {
+        return;
     }
-}
-
-function deleteComponentImpl(componentView) {
 
     var modelManager = componentView.getModelView().getModelManager(); 
     var component = componentView.getComponent();
@@ -119674,8 +119638,6 @@ class ParentComponentView extends ComponentView {
 
         //this will hold the resulting command
         let apogeeCommand;
-        let commandsDeleteComponent = false;
-        let deleteMsg;
 
         let initialSelection = editorState.selection;
         let initialMarks = editorState.marks;
@@ -119846,9 +119808,8 @@ class ParentComponentView extends ComponentView {
             // Get verificaion if we are deleting anything
             //-------------------
             if(allDeletedNames.length > 0) {
-                //flag a delete will be done
-                commandsDeleteComponent = true;
-                deleteMsg = "Are you sure you want to delete these apogee nodes: " + allDeletedNames + "?";
+                let doDelete = confirm("Are you sure you want to delete these apogee nodes: " + allDeletedNames);
+                if(!doDelete) return;
             }
 
             //-------------------------
@@ -119869,23 +119830,7 @@ class ParentComponentView extends ComponentView {
         //execute the command
         //-------------------
         if(apogeeCommand) {
-
-            let doAction = () => {
-                this.getModelView().getApp().executeCommand(apogeeCommand);
-                this.giveEditorFocusIfShowing();
-            };
-
-            if(commandsDeleteComponent) {
-                //if there is a delete, verify the user wants to do this
-                let cancelAction = () => {
-                    this.giveEditorFocusIfShowing();
-                };
-                showSimpleActionDialog(deleteMsg,["OK","Cancel"],[doAction,cancelAction]);
-            }
-            else {
-                //otherwise just take the action
-                doAction();
-            }
+            this.getModelView().getApp().executeCommand(apogeeCommand);
         }
     }
 
