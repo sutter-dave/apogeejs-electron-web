@@ -1,5 +1,5 @@
 // File: apogeeAppBundle.es.js
-// Version: 1.0.0-p4b
+// Version: 1.0.0-p4
 // Copyright (c) 2016-2020 Dave Sutter
 // License: MIT
 
@@ -11222,7 +11222,7 @@ class CommandHistory {
         
         this._saveCommand(command);
 
-        //set workspace dirty whenever a command is added to history (description as argument thrown in gratuitiously, or now)
+        //set workspace dirty whenever a command is added to history (description as argument thrown in gratuitiously, for now)
         this.eventManager.dispatchEvent("workspaceDirty",command.desc);
     }
     
@@ -25788,6 +25788,8 @@ class WorkspaceManager extends FieldObject {
             let referenceManager = new ReferenceManager(this.app);
             this.setField("referenceManager",referenceManager);
 
+            this.setField("isDirty",false);
+
             //this is not a field like above because when we do not require a command to change it
             this.fileMetadata = null;
 
@@ -25807,9 +25809,6 @@ class WorkspaceManager extends FieldObject {
         //==============
         this.viewStateCallback = null;
         this.cachedViewState = null;
-
-        //listen to the workspace dirty event from the app
-        this.app.addListener("workspaceDirty",() => this.setIsDirty());
 
         this.isClosed = false;
     }
@@ -25908,16 +25907,15 @@ class WorkspaceManager extends FieldObject {
     }
 
     getIsDirty() {
-        return this.isDirty;
-        
+        return this.getField("isDirty");
     }
     
     setIsDirty() {
-        this.isDirty = true;
+        this.setField("isDirty",true);
     }
     
     clearIsDirty() {
-        this.isDirty = false;
+        this.setField("isDirty",false);
     }
 
     getIsClosed() {
@@ -26154,6 +26152,9 @@ class Apogee {
         
         //command manager
         this.commandManager = new CommandManager(this);
+
+        //listen to the workspace dirty event from the app
+        this.addListener("workspaceDirty",() => this._setWorkspaceIsDirty());
         
         //----------------------------------
         //configure the application
@@ -26253,6 +26254,17 @@ class Apogee {
     clearWorkspaceIsDirty() {
         if(this.workspaceManager) {
             return this.workspaceManager.clearIsDirty();
+        }
+        else {
+            return false;
+        }
+    }
+
+    /** This method returns true if the workspcae contains unsaved data. 
+     * @private */
+    _setWorkspaceIsDirty() {
+        if(this.workspaceManager) {
+            return this.workspaceManager.setIsDirty();
         }
         else {
             return false;
