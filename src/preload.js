@@ -45,15 +45,26 @@ contextBridge.exposeInMainWorld('openSaveApi', {
     /** Saves file; onSave has on argument, the new metadata. If it is null the file was not saved. */
 	saveFile: (fileMetadata,data,onSave) => {
 
-        //show an alert dialog as a precaution to tell user we are writing to file system
-        let saveOk = confirm("Save to file location: " + createDisplayPath(fileMetadata));
-        if(saveOk) {
-            //save file to the given location
-            saveFileImpl(fileMetadata,data,onSave);
-        }
-        else {
-            onSave(null,false,null);
-        }
+		//show an alert dialog as a precaution to tell user we are writing to file system
+		var {dialog} = require('electron').remote;
+
+		let options = {
+			type: "question",
+			message: "Save to file location: " + createDisplayPath(fileMetadata) + "?",
+			buttons: ["OK","Cancel"]
+		}
+		var fileOpenPromise = dialog.showMessageBox(options);
+
+		fileOpenPromise.then( result => {
+			if(result.response == 0) {
+				saveFileImpl(fileMetadata,data,onSave);
+			}
+			else {
+				onSave(null,false,null);
+			}
+		}).catch(err => {
+			onSave(err,false,null);
+		});
     },
     
 	/** This opens a file. the argument onOpen is the callback with the args (err,data,fileMetadata). All null on not opened */
