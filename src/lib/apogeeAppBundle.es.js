@@ -1,5 +1,5 @@
 // File: apogeeAppBundle.es.js
-// Version: 1.0.0-p5
+// Version: 1.1.0-p0
 // Copyright (c) 2016-2020 Dave Sutter
 // License: MIT
 
@@ -130,6 +130,11 @@ apogeeutil$1.getObjectType = function(object) {
     }
     //not found
     return "Unknown";
+};
+
+/** This returns true if the object is a string. */
+apogeeutil$1.isString = function(object) {
+    return (typeof object == "string");
 };
 
 /** This method creates a deep copy of an object, array or value. Note that
@@ -22702,7 +22707,7 @@ class DecorationSet {
   // Create a set of decorations, using the structure of the given
   // document.
   static create(doc, decorations) {
-    return decorations.length ? buildTree(decorations, doc, 0, noSpec) : empty$1
+    return decorations.length ? buildTree(decorations, doc, 0, noSpec) : empty
   }
 
   // :: (?number, ?number, ?(spec: Object) → bool) → [Decoration]
@@ -22743,7 +22748,7 @@ class DecorationSet {
   //     that gets dropped as a result of the mapping, passing the
   //     spec of that decoration.
   map(mapping, doc, options) {
-    if (this == empty$1 || mapping.maps.length == 0) return this
+    if (this == empty || mapping.maps.length == 0) return this
     return this.mapInner(mapping, doc, 0, 0, options || noSpec)
   }
 
@@ -22758,7 +22763,7 @@ class DecorationSet {
     if (this.children.length)
       return mapChildren(this.children, newLocal, mapping, node, offset, oldOffset, options)
     else
-      return newLocal ? new DecorationSet(newLocal.sort(byPos)) : empty$1
+      return newLocal ? new DecorationSet(newLocal.sort(byPos)) : empty
   }
 
   // :: (Node, [Decoration]) → DecorationSet
@@ -22767,7 +22772,7 @@ class DecorationSet {
   // create the appropriate tree structure.
   add(doc, decorations) {
     if (!decorations.length) return this
-    if (this == empty$1) return DecorationSet.create(doc, decorations)
+    if (this == empty) return DecorationSet.create(doc, decorations)
     return this.addInner(doc, decorations, 0)
   }
 
@@ -22795,7 +22800,7 @@ class DecorationSet {
   // Create a new set that contains the decorations in this set, minus
   // the ones in the given array.
   remove(decorations) {
-    if (decorations.length == 0 || this == empty$1) return this
+    if (decorations.length == 0 || this == empty) return this
     return this.removeInner(decorations, 0)
   }
 
@@ -22812,7 +22817,7 @@ class DecorationSet {
       if (!found) continue
       if (children == this.children) children = this.children.slice();
       let removed = children[i + 2].removeInner(found, from + 1);
-      if (removed != empty$1) {
+      if (removed != empty) {
         children[i + 2] = removed;
       } else {
         children.splice(i, 3);
@@ -22826,11 +22831,11 @@ class DecorationSet {
       }
     }
     if (children == this.children && local == this.local) return this
-    return local.length || children.length ? new DecorationSet(local, children) : empty$1
+    return local.length || children.length ? new DecorationSet(local, children) : empty
   }
 
   forChild(offset, node) {
-    if (this == empty$1) return this
+    if (this == empty) return this
     if (node.isLeaf) return DecorationSet.empty
 
     let child, local;
@@ -22850,7 +22855,7 @@ class DecorationSet {
       let localSet = new DecorationSet(local.sort(byPos));
       return child ? new DecorationGroup([localSet, child]) : localSet
     }
-    return child || empty$1
+    return child || empty
   }
 
   eq(other) {
@@ -22872,7 +22877,7 @@ class DecorationSet {
   }
 
   localsInner(node) {
-    if (this == empty$1) return none
+    if (this == empty) return none
     if (node.inlineContent || !this.local.some(InlineType.is)) return this.local
     let result = [];
     for (let i = 0; i < this.local.length; i++) {
@@ -22883,11 +22888,11 @@ class DecorationSet {
   }
 }
 
-const empty$1 = new DecorationSet();
+const empty = new DecorationSet();
 
 // :: DecorationSet
 // The empty set of decorations.
-DecorationSet.empty = empty$1;
+DecorationSet.empty = empty;
 
 DecorationSet.removeOverlap = removeOverlap;
 
@@ -22904,7 +22909,7 @@ class DecorationGroup {
     let found = [];
     for (let i = 0; i < this.members.length; i++) {
       let result = this.members[i].forChild(offset, child);
-      if (result == empty$1) continue
+      if (result == empty) continue
       if (result instanceof DecorationGroup) found = found.concat(result.members);
       else found.push(result);
     }
@@ -22942,7 +22947,7 @@ class DecorationGroup {
   // a single set when possible.
   static from(members) {
     switch (members.length) {
-      case 0: return empty$1
+      case 0: return empty
       case 1: return members[0]
       default: return new DecorationGroup(members)
     }
@@ -22983,7 +22988,7 @@ function mapChildren(oldChildren, newLocal, mapping, node, offset, oldOffset, op
     let childNode = node.maybeChild(index);
     if (childNode && childOffset == fromLocal && childOffset + childNode.nodeSize == toLocal) {
       let mapped = children[i + 2].mapInner(mapping, childNode, from + 1, children[i] + oldOffset + 1, options);
-      if (mapped != empty$1) {
+      if (mapped != empty) {
         children[i] = fromLocal;
         children[i + 1] = toLocal;
         children[i + 2] = mapped;
@@ -23074,7 +23079,7 @@ function buildTree(spans, node, offset, options) {
     if (found) {
       hasNulls = true;
       let subtree = buildTree(found, childNode, offset + localStart + 1, options);
-      if (subtree != empty$1)
+      if (subtree != empty)
         children.push(localStart, localStart + childNode.nodeSize, subtree);
     }
   });
@@ -23083,7 +23088,7 @@ function buildTree(spans, node, offset, options) {
     if (options.onRemove) options.onRemove(locals[i].spec);
     locals.splice(i--, 1);
   }
-  return locals.length || children.length ? new DecorationSet(locals, children) : empty$1
+  return locals.length || children.length ? new DecorationSet(locals, children) : empty
 }
 
 // : (Decoration, Decoration) → number
@@ -23140,7 +23145,7 @@ function viewDecorations(view) {
   let found = [];
   view.someProp("decorations", f => {
     let result = f(view.state);
-    if (result && result != empty$1) found.push(result);
+    if (result && result != empty) found.push(result);
   });
   if (view.cursorWrapper)
     found.push(DecorationSet.create(view.state.doc, [view.cursorWrapper.deco]));
@@ -27826,13 +27831,6 @@ uiutil.getResourcePath = function(relativePath) {
 
 //I put some utilities in here. I shoudl figure out a better place to put this.
 
-//=====================================
-// ZIndex Constants
-//=====================================
-uiutil.MENU_ZINDEX = 100;
-uiutil.WINDOW_FRAME_ZINIDEX = 10;
-uiutil.DIALOG_ZINDEX = 200;
-
 //======================================
 // ID Generator
 //======================================
@@ -28267,9 +28265,9 @@ Menu.createMenu = function(text) {
         Menu.initialize();
     }
 
-    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-text");
-    element.innerHTML = text;
-    return new MenuHeader(element);
+    var labelElement = uiutil.createElementWithClass("div", "visiui-menu-label");
+    labelElement.innerHTML = text;
+    return new MenuHeader(labelElement);
 };
 
 /** This method creates a static menu from the given img url. */
@@ -28280,11 +28278,9 @@ Menu.createMenuFromImage = function(imageUrl) {
         Menu.initialize();
     }
 
-    var imageElement = document.createElement("img");
+    var imageElement = uiutil.createElementWithClass("img", "visiui-menu-label");
     imageElement.src = imageUrl;
-    var element = uiutil.createElementWithClass("div", "visiui-menu-heading visiui-menu-image");
-    element.appendChild(imageElement);
-    return new MenuHeader(element);
+    return new MenuHeader(imageElement);
 };
 
 /** This method creates a context menu object. */
@@ -28319,11 +28315,21 @@ Menu.menuHeaderPressed = function(menuHeader) {
 	}
 };
 
-Menu.nonMenuPressed = function() {
-	//if the mouse is pressed outside the menu, close any active menu
-	if(Menu.activeMenu) {
-		Menu.hideActiveMenu();
-	}
+Menu.globalPress = function(event) {
+    if(event.target.classList.contains("visiui-menu-item")) {
+        //menu item click - handled in menu item
+        return;
+    }
+    else if(event.target.classList.contains("visiui-menu-label")) {
+        //menu header clicked - handled in menu header
+        return;
+    }
+    else {
+        //if the mouse is pressed outside the menu, close any active menu
+        if(Menu.activeMenu) {
+            Menu.hideActiveMenu();
+        }
+    }
 };
 
 //================================
@@ -28370,13 +28376,13 @@ Menu.hideActiveMenu = function() {
 Menu.nonMenuMouseHandler = null;
 
 Menu.initialize = function() {
-	window.addEventListener("mousedown",Menu.nonMenuPressed);
+	window.addEventListener("mousedown",Menu.globalPress);
 	Menu.initialized = true;
 };
 
 /** This method allows you to undo the initialization actions. I am not sure you would ever need to do it. */
 Menu.deinitialize = function() {
-	window.removeEventListener("mousedown",Menu.nonMenuPressed);
+	window.removeEventListener("mousedown",Menu.globalPress);
 	Menu.initialized = false;
 };
 
@@ -28455,13 +28461,13 @@ class MenuBody {
     setPosition(x, y, parentElement) {
         this.parentElement = parentElement;
     
-    //we need to calculate the size, so I add and remove it - there is probably another way
-    parentElement.appendChild(this.menuDiv);
+        //we need to calculate the size, so I add and remove it - there is probably another way
+        parentElement.appendChild(this.menuDiv);
         var parentWidth = parentElement.offsetWidth;
         var parentHeight = parentElement.offsetHeight;
         var menuWidth = this.menuDiv.clientWidth;
         var menuHeight = this.menuDiv.clientHeight;
-    parentElement.appendChild(this.menuDiv);
+        parentElement.appendChild(this.menuDiv);
 
         //position
         if((x + menuWidth > parentWidth)&&(x > parentWidth/2)) {
@@ -28515,20 +28521,9 @@ class MenuBody {
             childMenuDiv.style.left = "100%";
             childMenuDiv.style.top = "0%";
             itemInfo.element.appendChild(childMenuDiv);
-            
-            //prevent normal action on a click
-            itemInfo.element.onmousedown = (event) => {
-                event.stopPropagation();
-            };
-            itemInfo.element.onclick = (event) => {
-                event.stopPropagation();
-            };
         }
         else {
             //create a norman (clickable) menu item
-            itemInfo.element.onmousedown = (event) => {
-                event.stopPropagation();
-            };
             itemInfo.element.onclick = (event) => {
                 //close menu
                 Menu.hideActiveMenu();
@@ -28542,7 +28537,6 @@ class MenuBody {
                     //use the callback
                     itemInfo.callback();
                 }
-                event.stopPropagation();
             };
         }
         
@@ -28615,15 +28609,19 @@ class MenuBody {
  */
 class MenuHeader {
 
-    constructor(domElement) {
+    constructor(labelElement) {
         
         //variables
-        this.domElement = domElement;
+        this.labelElement = labelElement;
+        this.domElement = uiutil.createElementWithClass("div", "visiui-menu-heading");
+        this.domElement.appendChild(this.labelElement);
         this.menuBody = new MenuBody();
-        
+
         //construct the menu
-        this.initHeadingElement();
-        
+        this.labelElement.onmousedown = (e) => {
+            Menu.menuHeaderPressed(this);
+        };
+   
         //attach menu to heading
         this.menuBody.attachToMenuHeader(this);
     }
@@ -28682,17 +28680,6 @@ class MenuHeader {
      * for static menus where we do not want to populate it ahead of time. */
     setAsOnTheFlyMenu(getMenuItemsCallback) {
         this.menuBody.setAsOnTheFlyMenu(getMenuItemsCallback);
-    }
-    //================================
-    // Init
-    //================================
-
-    /** this adds a menu item that dispatchs the given event when clicked. */
-    initHeadingElement() {	
-        this.domElement.onmousedown = (e) => {
-            Menu.menuHeaderPressed(this);
-            e.stopPropagation();
-        };	
     }
 
 }
@@ -30683,15 +30670,398 @@ ConfigurablePanelConstants.STATE_INACTIVE = "inactive";
 ConfigurablePanelConstants.DEFAULT_SUBMIT_LABEL = "OK";
 ConfigurablePanelConstants.DEFAULT_CANCEL_LABEL = "Cancel";
 
+/** This is an element that composes the content of a configurable panel.
+ * 
+ * @class 
+ */
+class ConfigurableElement {
+    constructor(form,elementInitData) {
+        this.form = form;
+        this.key = elementInitData.key;
+        this.meta = elementInitData.meta;
+        this.isMultiselect = false;
+
+        this.onChangeListeners = [];
+        this.onInputListeners = [];
+
+        this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS});
+        //explicitly set the margin and padding
+        this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_STANDARD;
+        this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_STANDARD;
+        this.domElement.style.display = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
+
+        this.visibleDisplayStyle = ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE;
+    }
+    
+    /** This method returns the key for this ConfigurableElement within this panel. */
+    getKey() {
+        return this.key;
+    }
+
+    /** This method returns the configured meta value for this element. */
+    getMeta() {
+        return this.meta;
+    }
+
+    /** This method returns value for this given element, if applicable. If not applicable
+     * this method returns undefined. */
+    getValue() {
+        return undefined;
+    }  
+
+    /** This method updates the value for a given element. See the specific element
+     * to see if this method is applicable. */
+    setValue(value) {
+        this.setValueImpl(value);
+        this.valueChanged(true);
+    }
+    
+    getState() {
+        return this.state;
+    }
+
+    /** This hides or shows the given element within the panel. */
+    setState(state) {
+        this.state = state;
+        switch(state) {
+            case ConfigurablePanelConstants.STATE_NORMAL:
+                this._setVisible(true);
+                this._setDisabled(false);
+                break;
+                
+            case ConfigurablePanelConstants.STATE_DISABLED:
+                this._setVisible(true);
+                this._setDisabled(true);
+                break;
+                
+            case ConfigurablePanelConstants.STATE_HIDDEN:
+                this._setVisible(false);
+                break;
+                
+            case ConfigurablePanelConstants.STATE_INACTIVE:
+                this._setVisible(false);
+                break;
+        }
+        
+    }
+
+    /** This method returns the DOM element for this configurable element. */
+    getElement() {
+        return this.domElement;
+    }
+    
+    /** This method returns the parent form for this configurable element. */
+    getForm() {
+        return this.form;
+    }
+
+    addOnChange(onChange) {
+        this.onChangeListeners.push(onChange);
+    }
+
+    addOnInput(onInput) {
+        this.onInputListeners.push(onInput);
+    }
+
+    /** This is used to determine what type of child element this is for a panel. */
+    get elementType() {
+        return "ConfigurableElement";
+    }
+
+    //==================================
+    //protected methods
+    //==================================
+
+    /** If the element returns multiple selected values, such as a checkbox group, then isMultiselect
+     * should be set to true. The default is false. */
+    setIsMultiselect(isMultiselect) {
+        this.isMultiselect = isMultiselect;
+    }
+
+    /** This method should be implemented by extending to set the value for the element. The method 
+     * "valueChanged" does not need to be called. It is called automatically. */
+    setValueImpl(value) {}
+
+    /** This method should be called when the value changes. Here value changed refers to a completed
+     * input. For example typing a character a text field should not trigger this event, only the update 
+     * of the value of a given field. */
+    valueChanged() {
+        if(this.onChangeListeners.length > 0) {
+            let value =this.getValue();
+            this.onChangeListeners.forEach( listener => listener(value,this.form));
+        }
+    }
+
+    /** This method should be called input is done at the user interface. Thiw is should be called when typing
+     * characters in a text field or when changing an element such as a checkbox. */
+    inputDone() {
+        if(this.onInputListeners.length > 0) {
+            let value =this.getValue();
+            this.onInputListeners.forEach( listener => listener(value,this.form));
+        }
+    }
+
+    /** This function should be used to set the display state for the element, since that variable
+     * is also used to control visibility. */
+    setVisibleDisplayStyle(visibleDisplayStyle) {
+        this.visibleDisplayStyle = visibleDisplayStyle;
+        if(this.domElement.style.display != "none") {
+            this.domElement.style.display = this.visibleDisplayStyle;
+        }
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+    
+    /** This method does standard initialization which requires the element be created. 
+     * Any extending method should call this at the end of the constructor. */
+    _postInstantiateInit(elementInitData) {
+        
+        //standard fields
+        if(elementInitData.value !== undefined) {
+            this.setValue(elementInitData.value);
+        }
+        
+        var state = (elementInitData.state != undefined) ? elementInitData.state : ConfigurablePanelConstants.STATE_NORMAL;
+        this.setState(state);
+        
+        //standard events
+        if(elementInitData.onChange) {
+            this.addOnChange(elementInitData.onChange);
+        }
+        if(elementInitData.onInput) {
+            this.addOnInput(elementInitData.onInput);
+        }
+        
+        //dependent element logic
+        if(elementInitData.selector) {
+            this._addSelector(elementInitData.selector);
+        }
+        if(elementInitData.inherit) {
+            if(Array.isArray(elementInitData.inherit)) {
+                elementInitData.inherit.forEach(inheritConfig => this._addInherit(inheritConfig));
+            }
+            else {
+                throw new Error("Inherit config should be an array: " + elementInitData.key);
+            }
+        }
+        if(elementInitData.react) {
+            if(Array.isArray(elementInitData.react)) {
+                elementInitData.react.forEach(reactConfig => this._addReact(reactConfig));
+            }
+            else {
+                throw new Error("React config should be an array: " + elementInitData.key);
+            }
+        }
+    }
+    
+    _setDisabled(isDisabled) {};
+    
+    _setVisible(isVisible) {
+        if(isVisible) {
+            this.domElement.style.display = this.visibleDisplayStyle;
+        }
+        else {
+            this.domElement.style.display = "none";
+        }
+    }
+
+    /** This processes a selector entry from the init data */
+    _addSelector(selectorConfig) {
+        //parent element
+        let parentKey = selectorConfig.parentKey;
+        if(!parentKey) throw new Error("Parent key is required for a selectable child element:" + selectorConfig.key); 
+
+        //get the target values. This can bve a single value of a list of values
+        let target, targetIsMultichoice;
+        if(selectorConfig.parentValue !== undefined) {
+            target = selectorConfig.parentValue;
+            targetIsMultichoice = false;
+        }
+        else if(selectorConfig.parentValues !== undefined) {
+            target = selectorConfig.parentValues;
+            targetIsMultichoice = true;
+        }
+        else {
+            throw new Error("A child selectable element must contain a value or list of values: " + selectorConfig.key)
+        }
+
+        //optional value
+        let keepActiveOnHide =  selectorConfig.keepActiveOnHide;
+
+        
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for selectable child element " + selectorConfig.key);
+        
+        let onValueChange = parentElement._getDependentSelectHandler(this,target,targetIsMultichoice,keepActiveOnHide);
+        
+        if(onValueChange) {
+            parentElement._addDependentCallback(onValueChange);
+        }
+    }
+
+    /** This processes a inherit entry from the init data */
+    _addInherit(inheritConfig) {
+        let parentKey = inheritConfig.parentKey;
+        let childKey = inheritConfig.childKey;
+
+        if(!parentKey) throw new Error("A parent key is required for a inherit child element:" + inheritConfig.key);
+        if(!childKey) throw new Error("A child key is required for an inherit child element: " + inheritConfig.key)
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for inherit child element " + inheritConfig.key);
+        if(!this.inherit) throw new Error("The element " + inheritConfig.key + " does not support inherit");
+        
+        let onValueChange = (parentValue) => {
+            this.inherit(childKey,parentValue);
+        };
+        parentElement._addDependentCallback(onValueChange);
+    }
+
+    /** This processes a react entry from the init data */
+    _addReact(reactConfig) {
+        let parentKey = reactConfig.parentKey;
+        let onValueChangeGenerator = reactConfig.generator;
+
+        if(!parentKey) throw new Error("A parent key is required for a react child element:" + reactConfig.key);
+        if(!onValueChangeGenerator) throw new Error("A callback generator is required for an react child element: " + reactConfig.key)
+        let parentElement = this.form.getEntry(parentKey);
+        if(!parentElement) throw new Error("Parent element " + parentKey + " not found for react child element " + reactConfig.key);
+        
+        let onValueChange = onValueChangeGenerator(this);
+        if(onValueChange) {
+            parentElement._addDependentCallback(onValueChange);
+        }
+    }
+
+    
+    /** This method returns the onValueChange handler to make the dependent element
+     * visible when the parent element (as the element depended on) has the/a proper value. */
+    _getDependentSelectHandler(dependentElement,target,targetIsMultichoice,keepActiveOnHide) {
+        //handle cases of potential multiple target values and multiple select parents
+        let valueMatch;
+        if(this.isMultiselect) {
+            if(targetIsMultichoice) {
+                valueMatch = parentValue => containsCommonValue(target,parentValue);
+            }
+            else {
+                valueMatch = parentValue => (parentValue.indexOf(target) >= 0);
+            }
+        }
+        else {
+            if(targetIsMultichoice) {
+                valueMatch = parentValue => (target.indexOf(parentValue) >= 0);
+            }
+            else {
+                valueMatch = parentValue => (parentValue == target);
+            }
+        }
+        
+        //this is the function that will do the test at compare time
+        return parentValue => {
+            let state;
+            if(valueMatch(parentValue)) {
+                state = ConfigurablePanelConstants.STATE_NORMAL;
+            }
+            else {
+                state = (keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE);
+            }
+
+            if(dependentElement.getState() != state) {
+                dependentElement.setState(state);
+            }
+        }
+    }
+
+    /** This function adds a callback that came from config element initialization */
+    _addDependentCallback(onValueChange) {
+        if(!this.dependentCallbacks) {
+            this._initForDependents();
+        }
+        this.dependentCallbacks.push(onValueChange);
+
+        //call now to initialize state
+        onValueChange(this.getValue());
+    }
+
+    /** This function calls all the onValueChange callbacks for dependent elements. */
+    _callDependentCallbacks(value) {
+        if(this.dependentCallbacks) {
+            this.dependentCallbacks.forEach( onValueChange => onValueChange(value) );
+        }
+    }
+
+    _initForDependents() {
+        this.dependentCallbacks = [];
+        this.addOnChange( (value,form) => this._callDependentCallbacks(value) );
+    }
+            
+}
+
+ConfigurableElement.CONTAINER_CLASS = "apogee_configurablePanelLine";
+
+ConfigurableElement.ELEMENT_MARGIN_STANDARD = "0px";
+ConfigurableElement.ELEMENT_MARGIN_NONE = "0px";
+ConfigurableElement.ELEMENT_PADDING_STANDARD = "4px";
+ConfigurableElement.ELEMENT_PADDING_NONE = "0px";
+ConfigurableElement.ELEMENT_DISPLAY_FULL_LINE = "block";
+ConfigurableElement.ELEMENT_DISPLAY_PARTIAL_LINE = "inline-block";
+ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE = "none";
+
+//================
+//Other functions
+//================
+
+/**This function checks if the two array share any common values. */
+function containsCommonValue(array1,array2) {
+    return array1.some( value => (array2.indexOf(value) >= 0) );
+}
+
+/** This is a heading element configurable element.
+ * 
+ * @class 
+ */
+class ErrorElement extends ConfigurableElement {
+
+    constructor(form,elementInitData,error) {
+        super(form,DUMMY_INIT);
+        
+        var containerElement = this.getElement();
+        
+        let errorMsg = error.toString();
+        let initData;
+        try {
+            initData = elementInitData ? JSON.stringify(elementInitData,null,"\t") : NO_INIT_DATA_MSG;
+        }
+        catch {
+            initData = NO_INIT_DATA_MSG;
+        }
+
+        containerElement.style.color = "red";
+        containerElement.style.border = "1px dashed red";
+        containerElement.style.fontSize = ".8em";
+        containerElement.innerHTML = `<b>Error<b>: ${errorMsg}<br><pre>${initData}</pre>`;
+    }
+
+}
+
+let DUMMY_INIT = {
+    type: "error"
+};
+
+const NO_INIT_DATA_MSG = "-- init data not available --";
+
+ErrorElement.TYPE_NAME = "error";
+
 /** This is a panel with forma elements that can be configured using a javascript object.
  * 
  * @class 
  */
 class ConfigurablePanel {
     
-    constructor(optionalContainerClassName = ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED) {
+    constructor() {
         this.elementObjects = [];
-        this.panelElement = this.createPanelElement(optionalContainerClassName); 
+        this.panelElement = this.createPanelElement(ConfigurablePanel.PANEL_CLASS_NORMAL); 
     }
     
     configureForm(formInitData) {
@@ -30732,7 +31102,8 @@ class ConfigurablePanel {
             }
         }
         catch(error) {
-            var errorMsg = "Error in panel: " + error.message;
+            var errorMsg = "Error in panel: " + error.toString();
+            if(error.stack) console.error(error.stack);
             
             //display an error layout
             //but only try this once. If the error layout throws an error jsut continue
@@ -30746,6 +31117,20 @@ class ConfigurablePanel {
     /** This method returns the ConfigurableElement for the given key. */
     getEntry(key) {
         return this.elementObjects.find(elementObject => elementObject.getKey() == key);
+    }
+
+    /** This returns the meta value for the panel. */
+    getMeta() {
+        //create the meta value
+        let meta = {};
+        this.elementObjects.forEach(elementObject => {
+            let childMeta = elementObject.getMeta();
+            let childKey = elementObject.getKey();
+            if((childMeta)&&(childKey)) {
+                meta[childKey] = childMeta;
+            }
+        });
+        return meta;
     }
 
     /** This method returns the data value object for this given panel. */
@@ -30806,11 +31191,19 @@ class ConfigurablePanel {
     
     //takes a handler onChange(formValue,form)
     addOnChange(onChange) {
-        var childOnChange = (childValue,form) => {
+        let onChildChange = (childValue,form) => {
             var formValue = this.getValue();
             onChange(formValue,form);
         };
-        this.elementObjects.forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(childOnChange);} );
+        this.elementObjects.forEach( elementObject => elementObject.addOnChange(onChildChange));
+    }
+
+    addOnInput(onInput) {
+        let onChildInput = (childValue,form) => {
+            var formValue = this.getValue();
+            onInput(formValue,form);
+        };
+        this.elementObjects.forEach( elementObject => elementObject.addOnInput(onChildInput));
     }
     
     setDisabled(isDisabled) {
@@ -30845,41 +31238,61 @@ class ConfigurablePanel {
     createPanelElement(containerClassName) {
         var panelElement = document.createElement("div");
         panelElement.className = containerClassName;
+        //explicitly remove margin and padding
+        panelElement.style.margin = "0px";
+        panelElement.style.padding = "0px";
         return panelElement;
     }
     
     /** this is called internally to add an element to the panel. */
     addToPanel(elementInitData) {
+        let elementObject;
+
+        try {
+            elementObject = ConfigurablePanel.instantiateConfigurableType(this,elementInitData);
+        }
+        catch(error) {
+            //create an error element if there is an error
+            elementObject = new ErrorElement(this,elementInitData,error);
+        }
+
+        //add the dome element for the container
+        var domElement = elementObject.getElement();
+        if(domElement) {
+            this.panelElement.appendChild(domElement);
+        }
+
+        if(elementObject.elementType == "ConfigurableElement") {
+            //add all child elements from this container to the child element list
+            this.elementObjects.push(elementObject);  
+        }
+    }
+
+    /** This method is called by a child layout container to pass children element objects to the form.  */
+    insertChildElement(configurableElement) {
+        this.elementObjects.push(configurableElement);
+    }
+
+    static instantiateConfigurableType(form,elementInitData) {
         var type = elementInitData.type;
         if(!type) {
             throw new Error("Type not found for configurable form entry!");
         }
         
-        var constructor = ConfigurablePanel.getTypeConstructor(type);
+        var constructor = ConfigurablePanel.elementMap[type];
         if(!constructor) {
             throw new Error("Type not found for configurable element: " + type);
         }
 
-        var elementObject = new constructor(this,elementInitData);
-
-        
-        this.elementObjects.push(elementObject);
-        var domElement = elementObject.getElement();
-        if(domElement) {
-            this.panelElement.appendChild(domElement);
-        }
-    }
-    
-    static getTypeConstructor(type) {
-        return ConfigurablePanel.elementMap[type];
+        return new constructor(form,elementInitData);
     }
 }
 
 //static fields
 ConfigurablePanel.elementMap = {};
 
-ConfigurablePanel.CONTAINER_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
-ConfigurablePanel.CONTAINER_CLASS_SELF_SIZED = "apogee_configurablePanelBody_selfSized";
+ConfigurablePanel.PANEL_CLASS = "apogee_configurablePanelBody";
+ConfigurablePanel.PANEL_CLASS_FILL_PARENT = "apogee_configurablePanelBody_fillParent";
 
 //This is displayed if there is an invalid layout passed in
 ConfigurablePanel.INVALID_INIT_DATA = {
@@ -30896,185 +31309,129 @@ ConfigurablePanel.EMPTY_LAYOUT = {
     layout: []
 };
 
-/** This is an element that composes the content of a configurable panel.
- * 
- * @class 
- */
-class ConfigurableElement {
-    constructor(form,elementInitData,optionalContainerClassName = ConfigurableElement.CONTAINER_CLASS_STANDARD) {
-        this.form = form;
-        this.key = elementInitData.key;
-        this.domElement = uiutil.createElement("div",{"className":optionalContainerClassName});
-    }
-    
-    /** This method returns the key for this ConfigurableElement within this panel. */
-    getKey() {
-        return this.key;
-    }
+/** This function takes a configurable form value and converts it to a function body that
+ * allows for expressions to be entered into the form. Definition of what is an expression versus
+ * a simple value is done in the "meta" field of the form config. */
+function getFormResultFunctionBody(formValue,formMeta) {
+    let parentObjectName = "output";
+    let functionLines = [];
+    functionLines.push("let output = {};");
 
-    /** This method returns value for this given element, if applicable. If not applicable
-     * this method returns undefined. */
-    getValue() {
-        return undefined;
-    }  
-    
-    getState() {
-        return this.state;
+    //load the converted data
+    _loadPanelLines(parentObjectName,formValue,formMeta,functionLines);
+
+    //save the raw form data too - to reload the form
+    let assigneeName = parentObjectName + '["' + STORED_FORM_VALUE_NAME + '"]'; 
+    _loadSimpleValueEntry(assigneeName,formValue,functionLines);
+
+    functionLines.push("return output;");
+    return functionLines.join("\n");
+}
+
+const STORED_FORM_VALUE_NAME = "storedFormValue";
+
+/** This loads a value to an assignee, as part of the form result function body. */
+function _loadEntry(assigneeName,value,meta,functionLines) {
+    if((value === undefined)||(value === null)||((meta)&&(meta.excludeValue !== undefined)&&(meta.excludeValue === value))) {
+        //value excluded
+        //handle value === undefined!!
+        return false;
     }
-
-    /** This hides or shows the given element within the panel. */
-    setState(state) {
-        this.state = state;
-
-console.log("Settings state: " + state + "; element key: " + this.key);
-         
-        switch(state) {
-            case ConfigurablePanelConstants.STATE_NORMAL:
-                this._setVisible(true);
-                this._setDisabled(false);
-                break;
+        
+    //add value
+    if((meta)&&(meta.expression)) {
+        //expression
+        switch(meta.expression) {
+            case "simple":
+                return _loadSimpleExpressionEntry(assigneeName,value,functionLines);
                 
-            case ConfigurablePanelConstants.STATE_DISABLED:
-                this._setVisible(true);
-                this._setDisabled(true);
-                break;
+            case "object":
+                functionLines.push(assigneeName + "= {};");
+                _loadPanelLines(assigneeName,value,meta.childMeta,functionLines);
+                //for now we always add the base object, even if empty
+                return true;
                 
-            case ConfigurablePanelConstants.STATE_HIDDEN:
-                this._setVisible(false);
-                break;
+            case "array": 
+                functionLines.push(assigneeName + "= []");
+                if(meta.childMeta) {
+                    _loadMultiTypedArrayLines(assigneeName,value,meta.childMeta,functionLines);
+                }
+                else if(meta.entryMeta) {
+                    _loadSingleTypedArrayLines(assigneeName,value,meta.entryMeta,functionLines);
+                }
+                //for now we always add the base array, even if empty
+                return true;
                 
-            case ConfigurablePanelConstants.STATE_INACTIVE:
-                this._setVisible(false);
-                break;
-        }
-        
-    }
-
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
-    }
-
-    /** This method returns the DOM element for this configurable element. */
-    getElement() {
-        return this.domElement;
-    }
-    
-    /** This method returns the parent form for this configurable element. */
-    getForm() {
-        return this.form;
-    }
-    
-    /** This allows this element to control visibility of the given child.
-     * When the value of the element is set, the child will be made visible depending
-     * if its childs target valud matches the current element value. */
-    addSelectionChild(childElement,value,keepActiveOnHide) {
-        if(!this.childSelectionElements) {
-            this._initAsParent();
-        }
-        var childData = {};
-        childData.element = childElement;
-        childData.value = value;
-        childData.keepActiveOnHide = keepActiveOnHide;
-        this.childSelectionElements.push(childData);
-        
-        this.setChildState(childData,this.getValue());
-    }
-    
-    checkChildSelection(value) {
-        if((this.childSelectionElements)&&(this.setChildState)) {
-            this.childSelectionElements.forEach( childData => this.setChildState(childData,value));
-        } 
-    }
-    
-//    /* Implement this if the element can selector children */
-//    setChildState(childData,value) {
-//        
-//    }
-
-    //---------------------------------
-    //set child state implementations
-    //---------------------------------
-    
-    /** This is a function that can be used to set values when the parent element has a single value. */
-    static setChildStateSingleValue(childData,value) {
-console.log("Setting child state single. Child Data Value: " + childData.value + ". Parent value: " + value);
-        if(childData.value == value) {
-            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
-        }
-        else {
-            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
-            childData.element.setState(state);
+            default:
+                console.error("Expression type not supported: " + meta.expression);
+                return false;
         }
     }
-    
-    /** This is a function that can be used to set values when the parent element has an array value. */
-    static setChildStateArrayValue(childData,value) {
-console.log("Setting child state array.");
-        if(value.indexOf(childData.value) >= 0) {
-            childData.element.setState(ConfigurablePanelConstants.STATE_NORMAL);
-        }
-        else {
-            var state = childData.keepActiveOnHide ? ConfigurablePanelConstants.STATE_HIDDEN : ConfigurablePanelConstants.STATE_INACTIVE;
-            childData.element.setState(state);
-        }
-    }
-    
-    
-    //===================================
-    // internal Methods
-    //==================================
-    
-    /** This method does standard initialization which requires the element be created. 
-     * Any extending method should call this at the end of the constructor. */
-    _postInstantiateInit(elementInitData) {
-        
-        //standard fields
-        if(elementInitData.value !== undefined) {
-            this.setValue(elementInitData.value);
-        }
-        
-        var state = (elementInitData.state != undefined) ? elementInitData.state : ConfigurablePanelConstants.STATE_NORMAL;
-        this.setState(state);
-        
-        //standard events
-        if(elementInitData.onChange) {
-            this.addOnChange(elementInitData.onChange);
-        }
-        
-        //accont for parent elements
-        if(elementInitData.selector) {
-            if(!elementInitData.selector.parentKey) throw new Error("Parent key is required for a selectable child element:" + elementInitData.key);
-            if(elementInitData.selector.parentValue === undefined) throw new Error("A child selectable element must contain a value: " + elementInitData.key)
-            var parentElement = this.form.getEntry(elementInitData.selector.parentKey);
-            if(!parentElement) throw new Error("Parent element " + elementInitData.selector.parentKey + " not found for selectable child element " + elementInitData.key);
-            if(!parentElement.setChildState) throw new Error("Parent element " + elementInitData.selector.parentKey + " does not support selection of a child element - in element = " + elementInitData.key);
-            
-            parentElement.addSelectionChild(this,elementInitData.selector.parentValue,elementInitData.selector.keepActiveOnHide);
-        }
-    }
-    
-    _setDisabled(isDisabled) {};
-    
-    _setVisible(isVisible) {
-        if(isVisible) {
-            this.domElement.style.display = "";
-        }
-        else {
-            this.domElement.style.display = "none";
-        }
-    }
-    
-    _initAsParent() {
-        this.childSelectionElements = [];
-        this.parentOnChangeHandler = (value,form) => this.childSelectionElements.forEach( childElement => this.setChildState(childElement,value));
-        this.addOnChange(this.parentOnChangeHandler);
+    else {
+        //plain value, not an expression
+        return _loadSimpleValueEntry(assigneeName,value,functionLines);
     }
 }
 
-ConfigurableElement.CONTAINER_CLASS_STANDARD = "apogee_configurablePanelLine_standard";
-ConfigurableElement.CONTAINER_CLASS_NO_MARGIN = "apogee_configurablePanelPanelLine_noMargin";
-ConfigurableElement.CONTAINER_CLASS_INVISIBLE = "apogee_configurablePanelPanelLine_hidden";
+/** This loads a value to an assignee for a simple value, as part of the form result function body. */
+function _loadSimpleValueEntry(assigneeName,value,functionLines) {
+    let line = assigneeName + " = " + JSON.stringify(value);
+    functionLines.push(line);
+    return true;
+}
+
+/** This loads a value to an assignee for a simple expression, as part of the form result function body. */
+function _loadSimpleExpressionEntry(assigneeName,value,functionLines) {
+    let trimmedValue = value.toString().trim();
+    if(trimmedValue === "") return false;
+    
+    let line = assigneeName + " = " + trimmedValue;
+    functionLines.push(line);
+    return true;
+}
+
+/** This loads a value to an assignee fpr a panel, as part of the form result function body. */
+function _loadPanelLines(parentObjectName,panelValue,panelMeta,functionLines) {
+    for(let key in panelValue) {
+        let meta = panelMeta[key];
+        let value = panelValue[key];
+        let assigneeName = parentObjectName + "[" + JSON.stringify(key) + "]";
+        _loadEntry(assigneeName,value,meta,functionLines);
+    }
+}
+
+/** This loads a value to an assignee for a multi-typed list, as part of the form result function body. */
+function _loadMultiTypedArrayLines(assigneeName,value,metaMap,functionLines) {
+    let insertIndex = 0;
+    let linesAdded = false;
+    value.forEach( (keyedEntry) => {
+        let key = keyedEntry.key;
+        let entryValue = keyedEntry.value;
+        let entryMeta = metaMap[key];
+        let entryAssigneeName = assigneeName + "[" + insertIndex + "]";
+        let lineAdded = _loadEntry(entryAssigneeName,entryValue,entryMeta,functionLines);
+        if(lineAdded) {
+            insertIndex++;
+            linesAdded = true;
+        }
+    });
+    return linesAdded;
+}
+
+/** This loads a value to an assignee for a single-typed list, as part of the form result function body. */
+function _loadSingleTypedArrayLines(assigneeName,value,entryMeta,functionLines) {
+    let insertIndex = 0;
+    let linesAdded = false;
+    value.forEach( (entryValue) => {
+        let entryAssigneeName = assigneeName + "[" + insertIndex + "]";
+        let lineAdded = _loadEntry(entryAssigneeName,entryValue,entryMeta,functionLines);
+        if(lineAdded) {
+            insertIndex++;
+            linesAdded = true;
+        }
+    });
+    return linesAdded;
+}
 
 /** This is an text field element configurable element.
  * 
@@ -31099,35 +31456,31 @@ class CheckboxElement extends ConfigurableElement {
         
         //checkbox field
         this.checkbox = uiutil.createElement("input",{"type":"checkbox"});
-        containerElement.appendChild(this.checkbox);  
+        containerElement.appendChild(this.checkbox); 
+        
+        //add dom listeners for events
+        this.checkbox.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateSingleValue;
+
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
         return this.checkbox.checked;
-    }   
+    } 
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //===================================
+    // protected Methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.checkbox.checked = (value === true);
-        
-        //needed for selection children
-        this.checkChildSelection(value);
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.checkbox.addEventListener("change",onChangeImpl);
     }
     
     //===================================
@@ -31148,6 +31501,9 @@ CheckboxElement.TYPE_NAME = "checkbox";
 class CheckboxGroupElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         super(form,elementInitData);
+
+        //this element returns a list of selections
+        this.setIsMultiselect(true);
         
         var containerElement = this.getElement();
         
@@ -31166,7 +31522,8 @@ class CheckboxGroupElement extends ConfigurableElement {
         
         //check boxes
         this.checkboxList = [];
-        var addCheckbox = checkboxInfo => {
+        this.valueMap = {};
+        var addCheckbox = (checkboxInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
@@ -31176,7 +31533,7 @@ class CheckboxGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(apogeeutil$1.getObjectType(checkboxInfo) == "Array") {
+            if(Array.isArray(checkboxInfo)) {
                 label = checkboxInfo[0];
                 value = checkboxInfo[1];     
             }
@@ -31184,46 +31541,57 @@ class CheckboxGroupElement extends ConfigurableElement {
                 label = checkboxInfo;
                 value = checkboxInfo; 
             }
-            checkbox.value = value;
+
+            //checkbox only holds string values. We will store the user set value externally
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value;
+            checkbox.value = standinValue;
+
             this.checkboxList.push(checkbox);
             buttonContainer.appendChild(checkbox);
             buttonContainer.appendChild(document.createTextNode(label));
 
             if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
-
             
             if(elementInitData.disabled) checkbox.disabled = true;
+
+            //add the dom listener
+            checkbox.addEventListener("change",() => {
+                this.inputDone();
+                this.valueChanged();
+            });
         };
-        elementInitData.entries.forEach(addCheckbox);   
+        elementInitData.entries.forEach(addCheckbox);  
+        
+        //add dom listeners
+        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        }));
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateArrayValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+        //return the check value mapped back to the proper (potentially non-string) value for the checkbox
+        return this.checkboxList.filter(checkbox => checkbox.checked).map(checkbox => this.valueMap[checkbox.value]); 
     }   
 
-    /** This method updates the list of checked entries. */
-    setValue(valueList) {
-        this.checkboxList.forEach(checkbox => checkbox.checked = (valueList.indexOf(checkbox.value) >= 0));
-        
-        //needed for selection children
-        this.checkChildSelection(valueList);
+    //==================================
+    // protected methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(valueList) {
+        this.checkboxList.forEach(checkbox => {
+            let standinValue = checkbox.value;
+            let properValue = this.valueMap[standinValue];
+            checkbox.checked = (valueList.indexOf(properValue) >= 0);
+        });
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.checkboxList.forEach(checkbox => checkbox.addEventListener("change",onChangeImpl));
-    }
-    
+
     //===================================
     // internal Methods
     //==================================
@@ -31234,6 +31602,65 @@ class CheckboxGroupElement extends ConfigurableElement {
 }
 
 CheckboxGroupElement.TYPE_NAME = "checkboxGroup";
+
+/** This is an text field element configurable element.
+ * 
+ * @class 
+ */
+class ColorPickerElement extends ConfigurableElement {
+    constructor(form,elementInitData) {
+        super(form,elementInitData);
+        
+        var containerElement = this.getElement();
+        
+        //label
+        if(elementInitData.label) {
+            this.labelElement = document.createElement("span");
+            this.labelElement.className = "apogee_configurablePanelLabel";
+            this.labelElement.innerHTML = elementInitData.label;
+            containerElement.appendChild(this.labelElement);
+        }
+        else {
+            this.labelElement = null;
+        }
+        
+        //slider
+        this.colorPickerElement = uiutil.createElement("input",{"type":"color"});
+        containerElement.appendChild(this.colorPickerElement); 
+
+        this.colorPickerElement.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
+
+        this._postInstantiateInit(elementInitData);
+    }
+    
+    /** This method returns value for this given element, if applicable. If not applicable
+     * this method returns undefined. */
+    getValue() {
+        return this.colorPickerElement.value;
+    }  
+    
+    //===================================
+    // protectd Methods
+    //==================================
+
+    /** This method updates the list of checked entries. */
+    setValueImpl(value) {
+        this.colorPickerElement.value = value;
+    }
+
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.colorPickerElement.disabled = isDisabled;
+    }
+}
+
+ColorPickerElement.TYPE_NAME = "colorPicker";
 
 /** This is a custom configurable element.
  * It elementInfoData should contain the entries:
@@ -31277,11 +31704,12 @@ class DropdownElement extends ConfigurableElement {
             this.labelElement = null;
         }
         
+        this.valueMap = {};
         this.select = uiutil.createElement("select");
-        var addEntry = entryInfo => {
+        var addEntry = (entryInfo,index) => {
             var label;
             var value;
-            if(apogeeutil$1.getObjectType(entryInfo) == "Array") {
+            if(Array.isArray(entryInfo)) {
                 label = entryInfo[0];
                 value = entryInfo[1];
             }
@@ -31289,47 +31717,49 @@ class DropdownElement extends ConfigurableElement {
                 label = entryInfo;
                 value = entryInfo;   
             }
+
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value;
+
             var entry = document.createElement("option");
             entry.text = label;
-            entry.value = value;
+            entry.value = standinValue;
             this.select.appendChild(entry);
         };
         if(elementInitData.entries) {
             elementInitData.entries.forEach(addEntry);
         }
         containerElement.appendChild(this.select); 
+
+        //add dom listeners
+        this.select.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
      * this method returns undefined. */
     getValue() {
-        return this.select.value;
-    }   
+        return this.valueMap[this.select.value];
+    }  
+    
+    //===================================
+    // protected Methods
+    //==================================
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
-        this.select.value = value;
-        
-        //needed for selection children
-        this.checkChildSelection(value);
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
+        let standinValue;
+        for(let key in this.valueMap) {
+            if(this.valueMap[key] === value) standinValue = key;
+        }
+        if(standinValue !== undefined) {
+            this.select.value = standinValue;
+        }
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.select.addEventListener("change",onChangeImpl);
-    }
-    
-    
-  
     
     //===================================
     // internal Methods
@@ -31341,6 +31771,255 @@ class DropdownElement extends ConfigurableElement {
 }
 
 DropdownElement.TYPE_NAME = "dropdown";
+
+/** This is an text field element configurable element.
+ * 
+ * @class 
+ */
+class ExtendedDropdownElement extends ConfigurableElement {
+    constructor(form,elementInitData) {
+        super(form,elementInitData);
+
+        if(!ExtendedDropdownElement.initialized) ExtendedDropdownElement._initialize();
+        
+        this.elementData = [];
+        this.value = null;
+
+        var containerElement = this.getElement();
+        
+        //label
+        if(elementInitData.label) {
+            this.labelElement = document.createElement("span");
+            this.labelElement.className = "apogee_configurablePanelLabel";
+            this.labelElement.innerHTML = elementInitData.label;
+            containerElement.appendChild(this.labelElement);
+        }
+        else {
+            this.labelElement = null;
+        }
+        
+        //add the head link
+        this.dropdownElement = document.createElement("div");
+        this.dropdownElement.className = "apogee_configurableExtendedDropdown";
+        containerElement.appendChild(this.dropdownElement);
+
+        this.headLink = this._createHeadLink();
+        this.dropdownElement.appendChild(this.headLink);
+        //add arrow!
+        //this.arrowGraphic = ???
+
+        this.dropdownElement.appendChild(document.createElement("br"));
+
+        //add the body container
+        this.bodyContainer = document.createElement("div");
+        this.bodyContainer.className = "apogee_configurableExtendedBodyContainer";
+        this.dropdownElement.appendChild(this.bodyContainer);
+
+        //add the content links
+        if(elementInitData.content) {
+            elementInitData.content.forEach( (contentEntry,index) =>  this._insertContentEntry(contentEntry,index));
+        }
+
+        //for now we don't properly handle no content or no selection
+        //fix this!!!
+        if(this.elementData.length == 0) throw new Error("Extended Dropdown needs some content, for now at least (fix this)");
+
+        let initialIndex;
+        if(elementInitData.value !== null) {
+            let entry = this.elementData.find( entry => (entry.value === elementInitData.value) );
+            if(entry) {
+                initialIndex = entry.index;
+            }
+            else {
+                initialIndex = 0;
+            }
+        }
+        
+        this._setSelection(initialIndex);
+
+        //-------------------------------------------------------------
+        //define content here//////////////////////////////////////////
+        //-------------------------------------------------------------
+
+        this._postInstantiateInit(elementInitData);
+    }
+    
+    /** This method returns value for this given element, if applicable. If not applicable
+     * this method returns undefined. */
+    getValue() {
+        return this.value;
+    }  
+    
+    //===================================
+    // protectd Methods
+    //==================================
+
+    /** This method updates the list of checked entries. */
+    setValueImpl(value) {
+        let elementEntry = this.elementData.find( elementEntry => elementEntry.value === value);
+        if(elementEntry) {
+            this._setSelection(elementEntry.index);
+        }
+        this.valueChanged();
+    }
+
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        console.error("Implement disabled in Extended Dropdown!");
+        //IMPLEMENT!!!
+
+        //if disabled:
+        //-close element
+        //-update class so it is grayed out a littel
+        //-disallow event handlers
+        //if enabled:
+        //normal operation
+    }
+
+    /** Sets the selection for the control. The index can be an integer or string. */
+    _setSelection(index) {
+        let elementEntry = this.elementData[index];
+        if(elementEntry) {
+            this.value = elementEntry.value;
+            this._setHeadLinkContent(elementEntry.html);
+        }
+    }
+
+    /** This generates the head link. */
+    _createHeadLink() {
+        let headLink = document.createElement("a");
+        headLink.className = "apogee_configurableExtendedHeadLink";
+        headLink.href = "javascript:void(0);";
+
+        headLink.onmousedown = e => ExtendedDropdownElement._onHeadMouseDown(e,this);
+        headLink.onkeydown = e => this._onHeadKeyDown(e);
+
+        return headLink;
+    }
+
+    /** This updates the head link content. */
+    _setHeadLinkContent(contentHTML) {
+        this.headLink.innerHTML = contentHTML;
+    }
+
+    /** This adds an new content entry to the body */
+    _insertContentEntry(contentEntry,index) {
+        let elementEntry = {};
+        elementEntry.index = index;
+        elementEntry.html = contentEntry[0];
+        elementEntry.value = contentEntry[1];
+        elementEntry.bodyElement = this._createBodyElement(elementEntry.html,elementEntry.index);
+
+        this.elementData.push(elementEntry);
+
+        this.bodyContainer.appendChild(elementEntry.bodyElement);
+        this.bodyContainer.appendChild(document.createElement("br"));
+    }
+
+    /** This generates a body link */
+    _createBodyElement(content,index) {
+        let bodyElement = document.createElement("div");
+        bodyElement.className = "apogee_configurableExtendedBodyElement";
+        bodyElement.innerHTML = content;
+
+        bodyElement.onclick = event => {
+            this._onBodyClick(index);
+        };
+
+        return bodyElement;
+    }
+
+    //---------------
+    //event handlers
+    //----------------
+
+    //char handling on head
+    _onHeadKeyDown(e) {
+
+    }
+    
+    //select current element as close body
+    _onBodyClick(index) {
+        this._setSelection(index);
+
+        this.inputDone();
+        this.valueChanged();
+
+        ExtendedDropdownElement._closeActiveDropdown();
+    }
+    
+    //char handling on body link
+    _onBodyKeyDown(e) {
+
+    }
+
+    //==========================================
+    // Static
+    //==========================================
+
+
+
+    static _initialize() {
+        window.addEventListener("mousedown",ExtendedDropdownElement._globalMouseDownListener);
+        ExtendedDropdownElement._initialized = true;
+    }
+
+    static _uninitialize() {
+        window.removeEventListener("mousedown",ExtendedDropdownElement._globalMouseDownListener);
+        ExtendedDropdownElement._initialized = false;
+    }
+
+    static _globalMouseDownListener(event) {
+        if(ExtendedDropdownElement.activeDropdown) {
+            if( (!event.target.classList.contains("apogee_configurableExtendedHeadLink")) &&
+                (!event.target.classList.contains("apogee_configurableExtendedBodyElement")) ) {
+                    ExtendedDropdownElement._closeActiveDropdown();
+            }
+        }
+    }
+
+    static _onHeadMouseDown(event,dropdown) {
+        if(dropdown != ExtendedDropdownElement.activeDropdown) {
+            //open the element
+            ExtendedDropdownElement._openDropdownElement(dropdown);
+        }
+        else {
+            //if we are activea and click the head, close the element
+            ExtendedDropdownElement._closeActiveDropdown();
+        }
+    }
+
+    static _openDropdownElement(dropdown) {
+        if(ExtendedDropdownElement.activeDropdown) ExtendedDropdownElement._closeActiveDropdown();
+
+        ExtendedDropdownElement._open(dropdown);
+        ExtendedDropdownElement.activeDropdown = dropdown;
+    } 
+
+    static _closeActiveDropdown() {
+        if(ExtendedDropdownElement.activeDropdown) {
+            ExtendedDropdownElement._close(ExtendedDropdownElement.activeDropdown);
+            ExtendedDropdownElement.activeDropdown = null;
+        }
+    }
+
+    static _open(dropdown) {
+        dropdown.bodyContainer.classList.add("apogee_configurableExtendedOpened");
+    }
+
+    static _close(dropdown) {
+        dropdown.bodyContainer.classList.remove("apogee_configurableExtendedOpened");
+    }
+
+}
+
+ExtendedDropdownElement.TYPE_NAME = "extendedDropdown";
+
+ExtendedDropdownElement.initialized = false;
+ExtendedDropdownElement.activeDropdown = null;
 
 /** This is a heading element configurable element.
  * 
@@ -31360,16 +32039,12 @@ class HeadingElement extends ConfigurableElement {
         else {
             headingLevel = HeadingElement.DEFAULT_HEADING_LEVEL;
         }
-        var headingType = "h" + headingLevel;
+        var headingClass = "apogee_configurablePanelHeading_" + headingLevel;
         
-        this.headingElement = uiutil.createElement(headingType,{"className":"apogee_configurablePanelHeading","innerHTML":elementInitData.text});
+        this.headingElement = uiutil.createElement("span",{"className":headingClass,"innerHTML":elementInitData.text});
         containerElement.appendChild(this.headingElement);
-    }
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action;
+        this._postInstantiateInit(elementInitData);
     }
 }
 
@@ -31392,11 +32067,6 @@ class HTMLDisplayElement extends ConfigurableElement {
         containerElement.innerHTML = elementInitData.html;
     }
 
-    /** This method updates the data for the given element. See the specific element
-     * type for fields that can be updated. */
-    updateData(elementInitData) {
-        //no action;
-    }
 }
 
 HTMLDisplayElement.TYPE_NAME = "htmlDisplay";
@@ -31410,7 +32080,10 @@ class InvisibleElement extends ConfigurableElement {
         //we will hide this element by setting display none. Someone can go ahead 
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_INVISIBLE);
+        super(form,elementInitData);
+
+        //update the class to be invisible
+        this.setVisibleDisplayStyle(ConfigurableElement.ELEMENT_DISPLAY_INVISIBLE);
         
         this._postInstantiateInit(elementInitData);
     }
@@ -31421,10 +32094,15 @@ class InvisibleElement extends ConfigurableElement {
         return this.value;
     }   
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //===================================
+    // protected Methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.value = value;
+
+        this.onChangeListeners.forEach(listener => listener(value,this.getForm()));
     }
 }
 
@@ -31436,7 +32114,7 @@ InvisibleElement.TYPE_NAME = "invisible";
  */
 class ListElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_STANDARD);
+        super(form,elementInitData);
 
         var containerElement = this.getElement();
 
@@ -31469,6 +32147,8 @@ class ListElement extends ConfigurableElement {
         this.elementContainer = null;
         this.listElement = this._createListContainer(); 
         containerElement.appendChild(this.listElement); 
+
+        this.inheritValueMap = {};
         
         this._postInstantiateInit(elementInitData);
     }
@@ -31498,9 +32178,47 @@ class ListElement extends ConfigurableElement {
         return listValue;
     }   
 
+    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
+     * the meta value depends on the content. */
+    getMeta() {
+        if(this.meta) {
+            //handle an empty list
+            if(this.listEntries.length === 0) return null;
+
+            let fullMeta = apogeeutil.jsonCopy(this.meta);
+            if(this.isMultiTypeList) {
+                let childMeta = {};
+                this.listEntries.forEach( listEntryInfo => {
+                    let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                    let childKey = listEntryInfo.elementObject.getKey();
+                    if((childEntryMeta)&&(childKey)) {
+                        childMeta[childKey] = childEntryMeta;
+                    }
+                });
+                fullMeta.childMeta = childMeta;
+            }
+            else {
+                let listEntryInfo = this.listEntries[0];
+                let childEntryMeta = listEntryInfo.elementObject.getMeta();
+                if(childEntryMeta) {
+                    fullMeta.entryMeta = childEntryMeta;
+                }
+            }
+
+            return fullMeta;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    //===================================
+    // protected Methods
+    //==================================
+
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    setValue(listValue) {
+    setValueImpl(listValue) {
         if(Array.isArray(listValue)) {
             let currentValue = this.getValue();
             //update values if the list changes
@@ -31539,19 +32257,27 @@ class ListElement extends ConfigurableElement {
                     }
                 });
             }
-
-            this._listValueChanged();
         }
         else {
             console.log("Value being set for list is not an array!");
         }
     }
-    
-    /** This will call the handler is this panel changes value. */
-    addOnChange(onChange) {
-        this.changeListener = onChange;
+
+    /** This function is used to inherit a child value from a parent value.
+     * It passes all values to any contained list element that has an inherit method. */
+    inherit(childKey,parentValue) {
+        //pass to any child entries applicable
+        this.listEntries.forEach( listEntry => {
+            let childElement = listEntry.elementObject;
+            if(childElement.inherit) {
+                childElement.inherit(childKey,parentValue);
+            }
+        }); 
+
+        //store the inherit value for when other entries created
+        this.inheritValueMap[childKey] = parentValue;
     }
-    
+
     //===================================
     // internal Methods
     //==================================
@@ -31559,12 +32285,6 @@ class ListElement extends ConfigurableElement {
     /** This looks up the entry type for a given key, based on the layout key. */
     _lookupEntryTypeJson(key) {
         return this.entryTypes.find( entryTypeJson => entryTypeJson.layout.key == key);
-    }
-
-    _listValueChanged() {
-        if(this.changeListener) {
-            this.changeListener(this.getValue(),this.getForm());
-        }
     }
     
     //---------------------
@@ -31606,18 +32326,25 @@ class ListElement extends ConfigurableElement {
         this.listEntries.push(listEntryData);
         this.elementContainer.appendChild(listEntryData.element);
 
-        //set value if applicable
+        //set value if set in config
         if(optionalValue !== undefined) {
             listEntryData.elementObject.setValue(optionalValue);
         }
 
-        //add the change listener for this element
-        if(listEntryData.elementObject.addOnChange) {
-            listEntryData.elementObject.addOnChange( () => this._listValueChanged());
+        //set value if set from inherit
+        for(let key in this.inheritValueMap) {
+            let childElement = listEntryData.elementObject;
+            if(childElement.inherit) {
+                childElement.inherit(key,this.inheritValueMap[key]);
+            }
         }
 
-        //nofity change
-        this._listValueChanged();
+        //add the change listener for this element
+        listEntryData.elementObject.addOnChange( () => this.valueChanged());
+        listEntryData.elementObject.addOnInput( () => this.inputDone());
+        
+        //nofityof value change
+        this.valueChanged();
     }
 
     _createListEntryData(entryTypeJson) {
@@ -31625,25 +32352,21 @@ class ListElement extends ConfigurableElement {
         let listEntry = {};
 
         //create element object
-        let layout = entryTypeJson.layout;
-        if(!layout) {
+
+        let elementInitData = entryTypeJson.layout;
+        if(!elementInitData) {
             throw new Error("Layout not found for list entry!");
         }
 
-        var type = layout.type;
-        if(!type) {
-            throw new Error("Type not found for list entry!");
-        }
-        
-        var constructor = ConfigurablePanel.getTypeConstructor(type);
-        if(!constructor) {
-            throw new Error("Type not found for list element: " + type);
-        }
+        var elementObject = ConfigurablePanel.instantiateConfigurableType(this.getForm(),elementInitData);
 
-        var elementObject = new constructor(this.getForm(),layout);
-
-        listEntry.elementObject = elementObject;
-        listEntry.element = this._createListDomElement(listEntry);
+        if(elementObject instanceof ConfigurableElement) {
+            listEntry.elementObject = elementObject;
+            listEntry.element = this._createListDomElement(listEntry);
+        }
+        else {
+            throw new Error("Only configurable elements cah be set as entry types for a list.");
+        }
 
         return listEntry;
     }
@@ -31714,7 +32437,7 @@ class ListElement extends ConfigurableElement {
             //listEntries.forEach( childEntry => this.elementContainer.appendChild(childEntry.element));
 
             //nofity change
-            this._listValueChanged();
+            this.valueChanged();
         }
     }
 
@@ -31728,7 +32451,7 @@ class ListElement extends ConfigurableElement {
             this.elementContainer.insertBefore(entry.element.nextSibling,entry.element);
 
             //nofity change
-            this._listValueChanged();
+            this.valueChanged();
         }
     }
 
@@ -31740,7 +32463,7 @@ class ListElement extends ConfigurableElement {
         this.elementContainer.removeChild(entry.element);
 
         //nofity change
-        this._listValueChanged();
+        this.valueChanged();
     }
 }
 
@@ -31752,18 +32475,22 @@ ListElement.TYPE_NAME = "list";
  */
 class PanelElement extends ConfigurableElement {
     constructor(form,elementInitData) {
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData);
         
         var containerElement = this.getElement();
-        //update the container class
-        containerElement.className = "apogee_configurablePanelPanelLine";
+        //udpate padding and margin to 0
+        containerElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
+        containerElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
         
         var formInitData = elementInitData.formData;
         this.panel = new ConfigurablePanel();
         this.panel.configureForm(formInitData);
         var panelElement = this.panel.getElement();
-        panelElement.className = "apogee_configurablePanelPanelLine";
-        containerElement.appendChild(panelElement);  
+        containerElement.appendChild(panelElement);
+
+        //add event listeners
+        this.panel.addOnInput( () => this.inputDone() );
+        this.panel.addOnChange( () => this.valueChanged() );
         
         this._postInstantiateInit(elementInitData);
     }
@@ -31774,16 +32501,35 @@ class PanelElement extends ConfigurableElement {
         return this.panel.getValue();
     }   
 
+    /** This overrides the get meta element to calculate it on the fly. Because of list elements,
+     * the meta value depends on the content. */
+    getMeta() {
+        if(this.meta) {
+            let fullMeta = apogeeutil.jsonCopy(this.meta);
+            fullMeta.childMeta = this.panel.getMeta();
+            return fullMeta;
+        }
+        else {
+            return null;
+        }
+    }
+
+    //===================================
+    // protected Methods
+    //==================================
+
     /** This method updates the value for a given element. See the specific element
      * to see if this method is applicable. */
-    setValue(value) {
+    setValueImpl(value) {
         this.panel.setValue(value);
     }
-    
-    /** This will call the handler is this panel changes value. */
-    addOnChange(onChange) {
-        //add this to each element in the panel
-        this.panel.getChildEntries().forEach( elementObject => {if(elementObject.addOnChange) elementObject.addOnChange(onChange);} );
+
+    /** This function is used to inherit a child value from a parent value */
+    inherit(childKey,parentValue) {
+        let childElement = this.panel.getEntry(childKey);
+        if((childElement)&&(childElement.getValue() != parentValue)) {
+            childElement.setValue(parentValue);
+        }    
     }
     
     //===================================
@@ -31822,9 +32568,10 @@ class RadioGroupElement extends ConfigurableElement {
         
         //radio buttons
         this.buttonList = [];
+        this.valueMap = {};
         var groupName = elementInitData.groupName;
         if(!groupName) groupName = getRandomString();
-        var addButton = buttonInfo => {
+        var addButton = (buttonInfo,index) => {
             var buttonContainer = uiutil.createElement("div");
             buttonContainer.style.display = elementInitData.horizontal ? "inline-block" : "block";
             containerElement.appendChild(buttonContainer);
@@ -31835,7 +32582,7 @@ class RadioGroupElement extends ConfigurableElement {
             
             var label;
             var value;
-            if(apogeeutil$1.getObjectType(buttonInfo) == "Array") {
+            if(Array.isArray(buttonInfo)) {
                 label = buttonInfo[0];
                 value = buttonInfo[1];     
             }
@@ -31843,19 +32590,27 @@ class RadioGroupElement extends ConfigurableElement {
                 label = buttonInfo;
                 value = buttonInfo; 
             }
-            radio.value = value;
+
+            //radiobutton only holds string values. We will store the user set value externally
+            let standinValue = String(index);
+            this.valueMap[standinValue] = value;
+            radio.value = standinValue;
+
             this.buttonList.push(radio);
             buttonContainer.appendChild(radio);
             buttonContainer.appendChild(document.createTextNode(label));
             
             if(elementInitData.horizontal) buttonContainer.appendChild(document.createTextNode("\u00A0\u00A0\u00A0\u00A0"));
+
+            //add dom listeners
+            radio.addEventListener("change",() => {
+                this.inputDone();
+                this.valueChanged();
+            });
         };
         elementInitData.entries.forEach(addButton);
         
         this._postInstantiateInit(elementInitData);
-        
-        //add suport for selection children
-        this.setChildState = ConfigurableElement.setChildStateSingleValue;
     }
     
     /** This method returns value for this given element, if applicable. If not applicable
@@ -31863,32 +32618,30 @@ class RadioGroupElement extends ConfigurableElement {
     getValue() {
         var checkedRadio = this.buttonList.find(radio => radio.checked);
         if(checkedRadio) {
-            return checkedRadio.value;
+            return this.valueMap[checkedRadio.value];
         }
         else {
             return undefined;
         }
-    }   
+    }  
+    
+    //===================================
+    // protectd Methods
+    //==================================
 
     /** This method updates the list of checked entries. */
-    setValue(value) {
-        var checkedButton = this.buttonList.find(radioButton => (radioButton.value == value));
+    setValueImpl(value) {
+        var checkedButton = this.buttonList.find(radioButton => {
+            let standinValue = radioButton.value;
+            let properButtonValue = this.valueMap[standinValue];
+            return (properButtonValue === value);
+        });
+
         if(checkedButton) {
             checkedButton.checked = true;
         }
-        
-        //needed for selection children
-        this.checkChildSelection(value);
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.buttonList.forEach(radioButton => radioButton.addEventListener("change",onChangeImpl));
-    }
-    
+
     //===================================
     // internal Methods
     //==================================
@@ -31908,14 +32661,87 @@ function getRandomString() {
  * 
  * @class 
  */
+class SliderElement extends ConfigurableElement {
+    constructor(form,elementInitData) {
+        super(form,elementInitData);
+        
+        var containerElement = this.getElement();
+        
+        //label
+        if(elementInitData.label) {
+            this.labelElement = document.createElement("span");
+            this.labelElement.className = "apogee_configurablePanelLabel";
+            this.labelElement.innerHTML = elementInitData.label;
+            containerElement.appendChild(this.labelElement);
+        }
+        else {
+            this.labelElement = null;
+        }
+        
+        //slider
+        this.sliderElement = uiutil.createElement("input",{"type":"range"});
+        containerElement.appendChild(this.sliderElement); 
+
+        this.sliderElement.addEventListener("change",() => {
+            this.inputDone();
+            this.valueChanged();
+        });
+
+        if(elementInitData.min !== undefined) {
+            this.sliderElement.min = elementInitData.min;
+        }
+        if(elementInitData.max !== undefined) {
+            this.sliderElement.max = elementInitData.max;
+        }
+        if(elementInitData.step !== undefined) {
+            this.sliderElement.step = elementInitData.step;
+        }
+
+        this._postInstantiateInit(elementInitData);
+    }
+    
+    /** This method returns value for this given element, if applicable. If not applicable
+     * this method returns undefined. */
+    getValue() {
+        let stringValue = this.sliderElement.value;
+        return parseFloat(stringValue);
+    }  
+    
+    //===================================
+    // protectd Methods
+    //==================================
+
+    /** This method updates the list of checked entries. */
+    setValueImpl(value) {
+        this.sliderElement.value = value;
+    }
+
+    //===================================
+    // internal Methods
+    //==================================
+    
+    _setDisabled(isDisabled) { 
+        this.sliderElement.disabled = isDisabled;
+    }
+}
+
+SliderElement.TYPE_NAME = "slider";
+
+/** This is an text field element configurable element.
+ * 
+ * @class 
+ */
 class SpacerElement extends ConfigurableElement {
     constructor(form,elementInitData) {
         //we will hide this element by setting display none. Someone can go ahead 
         //and show it, in which case they will get an empty element with margins.
         //maybe we should have a way to not create the element in the first place.
-        super(form,elementInitData,ConfigurableElement.CONTAINER_CLASS_NO_MARGIN);
+        super(form,elementInitData);
         
         var containerElement = this.getElement();
+        //udpate padding and margin to 0
+        containerElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
+        containerElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
         
         this.spacerElement = document.createElement("div");
         var spacerHeight;
@@ -32061,11 +32887,10 @@ class TextareaElement extends ConfigurableElement {
             this.inputElement.cols = elementInitData.cols;
         }
         containerElement.appendChild(this.inputElement); 
-        
-        //non standard events
-        if(elementInitData.onChangeCompleted) {
-            this.addOnChangeCompleted(elementInitData.onChangeCompleted);
-        }
+
+        //add dom listeners
+        this.inputElement.addEventListener("input",() => this.onInput());
+        this.inputElement.addEventListener("change",() => this.onChange());
         
         this._postInstantiateInit(elementInitData);
     }
@@ -32076,26 +32901,13 @@ class TextareaElement extends ConfigurableElement {
         return this.inputElement.value.trim();
     }   
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    //==================================
+    // protected methods
+    //==================================
+
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.inputElement.value = value;
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.inputElement.addEventListener("input",onChangeImpl);
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChangeCompleted(onChangeCompleted) {
-        var onChangeCompletedImpl = () => {
-            onChangeCompleted(this.getValue(),this.getForm());
-        };
-        this.inputElement.addEventListener("change",onChangeCompletedImpl);
     }
     
     //===================================
@@ -32138,43 +32950,27 @@ class TextFieldElement extends ConfigurableElement {
         if(elementInitData.size !== undefined) {
             this.inputElement.size = elementInitData.size;
         }
-        
-        //non-standard events
-        if(elementInitData.onChangeCompleted) {
-            this.addOnChangeCompleted(elementInitData.onChangeCompleted);
-        }
+
+        //add dom listeners for events
+        this.inputElement.addEventListener("input",() => this.inputDone());
+        this.inputElement.addEventListener("change",() => this.valueChanged());
         
         this._postInstantiateInit(elementInitData);
     }
-    
-    /** This method returns value for this given element, if applicable. If not applicable
-     * this method returns undefined. */
+
     getValue() {
         return this.inputElement.value.trim();
-    }   
+    }  
+    
+    //===================================
+    // protected Methods
+    //==================================
 
-    /** This method updates the value for a given element. See the specific element
-     * to see if this method is applicable. */
-    setValue(value) {
+    /** This method updates the UI value for a given element. */
+    setValueImpl(value) {
         this.inputElement.value = value;
     }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChange(onChange) {
-        var onChangeImpl = () => {
-            onChange(this.getValue(),this.getForm());
-        };
-        this.inputElement.addEventListener("input",onChangeImpl);
-    }
-    
-    /** This should be extended in elements to handle on change listeners. */
-    addOnChangeCompleted(onChangeCompleted) {
-        var onChangeCompletedImpl = () => {
-            onChangeCompleted(this.getValue(),this.getForm());
-        };
-        this.inputElement.addEventListener("change",onChangeCompletedImpl);
-    }
-    
+
     //===================================
     // internal Methods
     //==================================
@@ -32186,20 +32982,243 @@ class TextFieldElement extends ConfigurableElement {
 
 TextFieldElement.TYPE_NAME = "textField";
 
+/** This is a item that can be placed inside a panel container. In the initialization config it has child
+ * configurable elements (and configurable layout containers), however any child configurable element is included as a
+ * value in the parent panel. The configurable layout containers just holds to organize the DOM elements from its 
+ * children.
+ * 
+ * @class 
+ */
+class ConfigurableLayoutContainer {
+    constructor(form) {
+        this.form = form;
+        this.domElement = uiutil.createElement("div",{"className":ConfigurableElement.CONTAINER_CLASS});
+        //udpate padding and margin to 0
+        this.domElement.style.margin = ConfigurableElement.ELEMENT_MARGIN_NONE;
+        this.domElement.style.padding = ConfigurableElement.ELEMENT_PADDING_NONE;
+    }
+
+    /** This method returns the DOM element for this layout container. */
+    getElement() {
+        return this.domElement;
+    }
+    
+    /** This method returns the parent form for this configurable element. */
+    getForm() {
+        return this.form;
+    }
+
+    /** This is used to determine what type of child element this is for a panel. */
+    get elementType() {
+        return "ConfigurableLayoutContainer";
+    }
+
+    /** This function should be used to set the display state for the element, since that variable
+     * is also used to control visibility. */
+    setVisibleDisplayStyle(visibleDisplayStyle) {
+        this.visibleDisplayStyle = visibleDisplayStyle;
+        if(this.domElement.style.display != "none") {
+            this.domElement.style.display = this.visibleDisplayStyle;
+        }
+    }
+
+    //==================================
+    //protected methods
+    //==================================
+
+    /** This method intializes the container */
+    //initializeContainer(containerInitData);
+
+    /** This method adds the element to the container. */
+    //insertElement(elementObject,elementInitData));
+
+    /** this is called internally to add an element to the panel. */
+    addToContainer(elementInitData) {
+        var elementObject = ConfigurablePanel.instantiateConfigurableType(this.form,elementInitData);
+
+        //add the dom element for the child element
+        this.insertElement(elementObject,elementInitData);
+
+        //add the child configurable elements to the list
+        if(elementObject instanceof ConfigurableElement) {
+            //pass the element object to the form
+            this.form.insertChildElement(elementObject);
+        }
+        // else if(elementObject instanceof ConfigurableLayoutContainer) {
+        // }
+        // else {
+        //     throw new Error("Unknown form item class: " + typeof elementObject);
+        // } 
+    }
+      
+}
+
+/** This is a item that can be placed inside a panel container. In the initialization config it has child
+ * configurable elements (and configurable layout containers), however any child configurable element is included as a
+ * value in the parent panel. The configurable layout containers just holds to organize the DOM elements from its 
+ * children.
+ * 
+ * @class 
+ */
+class HoriontalLayout extends ConfigurableLayoutContainer {
+    constructor(form,containerInitData) {
+        super(form);
+
+        this._initializeContainer(containerInitData);
+    }
+
+
+    //==================================
+    //protected methods
+    //==================================
+
+    /** This method adds the element to the container. */
+    insertElement(elementObject,elementInitData) {
+        //explicitly set child to display multiple on a line.
+        elementObject.setVisibleDisplayStyle(ConfigurableElement.ELEMENT_DISPLAY_PARTIAL_LINE);
+
+        //add the dom element
+        let domElement = this.getElement();
+        domElement.appendChild(elementObject.getElement());
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+
+    /** This method intializes the container */
+    _initializeContainer(containerInitData) {
+        if(!Array.isArray(containerInitData.formData)) {
+            throw new Error("Improper format for Horizontal layout config. It should have a array named 'formData'");
+        }
+        //add each child to the layout
+        containerInitData.formData.forEach(elementInitData => this.addToContainer(elementInitData));
+    }
+ 
+}
+
+HoriontalLayout.TYPE_NAME = "horizontalLayout";
+
+/** This is a item that can be placed inside a panel container. In the initialization config it has child
+ * configurable elements (and configurable layout containers), however any child configurable element is included as a
+ * value in the parent panel. The configurable layout containers just holds to organize the DOM elements from its 
+ * children.
+ * 
+ * @class 
+ */
+class ShowHideLayout extends ConfigurableLayoutContainer {
+    constructor(form,containerInitData) {
+        super(form);
+
+        this.titleElement = null;
+        this.bodyElement = null;
+        this.control = null;
+        this.headingElement = null;
+
+        this.openedUrl = uiutil.getResourcePath("/opened_bluish.png");
+        this.closedUrl = uiutil.getResourcePath("/closed_bluish.png");
+
+        this._initializeContainer(containerInitData);
+    }
+
+
+    //==================================
+    //protected methods
+    //==================================
+
+    /** This method adds the element to the container. */
+    insertElement(elementObject,elementInitData) {
+        //add the dom element
+        this.bodyElement.appendChild(elementObject.getElement());
+    }
+    
+    //===================================
+    // internal Methods
+    //==================================
+
+    /** This method intializes the container */
+    _initializeContainer(containerInitData) {
+        let mainElement = this.getElement();
+        
+        //heading
+        this.headingElement = document.createElement("div");
+        this.headingElement.className = "apogee_configurableShowHideHeadingLine";
+        mainElement.appendChild(this.headingElement);
+        if(containerInitData.heading !== undefined) {
+            this.titleElement = document.createElement("span");
+            this.titleElement.innerHTML = containerInitData.heading;
+            let level;
+            if(containerInitData.level !== undefined) {
+                level = containerInitData.level;
+            }
+            else {
+                level = 4; //this is should be the level that is the same size as a label
+            }
+            let titleCssClass = "apogee_configurablePanelHeading_" + level;
+            this.titleElement.className = titleCssClass;
+            this.headingElement.appendChild(this.titleElement);
+        }
+        this.control = document.createElement("img");
+        this.control.className = "apogee_configurableShowHideControl";
+        this.headingElement.appendChild(this.control);
+        this.headingElement.onclick = () => this._toggleState();
+
+        //body
+        this.bodyElement = document.createElement("div");
+        this.bodyElement.className = "apogee_configurableShowHideBody";
+        mainElement.appendChild(this.bodyElement); 
+
+        //set the initial open closed state
+        let initialIsClosed = (containerInitData.closed === true);
+        this._setState(initialIsClosed);
+
+        //add each child to the layout
+        if(!Array.isArray(containerInitData.formData)) {
+            throw new Error("Improper format for Horizontal layout config. It should have a array named 'formData'");
+        }
+        containerInitData.formData.forEach(elementInitData => this.addToContainer(elementInitData));
+    }
+
+    _toggleState() {
+        this._setState(!this.isClosed);
+    }
+
+    _setState(isClosed) {
+        this.isClosed = isClosed;
+        if(this.isClosed) {
+            this.bodyElement.style.display = "none";
+            this.control.src = this.closedUrl;
+        }
+        else {
+            this.bodyElement.style.display = "";
+            this.control.src = this.openedUrl;
+        }
+    }
+ 
+}
+
+ShowHideLayout.TYPE_NAME = "showHideLayout";
+
 ConfigurablePanel.addConfigurableElement(CheckboxElement);
 ConfigurablePanel.addConfigurableElement(CheckboxGroupElement);
+ConfigurablePanel.addConfigurableElement(ColorPickerElement);
 ConfigurablePanel.addConfigurableElement(CustomElement);
 ConfigurablePanel.addConfigurableElement(DropdownElement);
+ConfigurablePanel.addConfigurableElement(ExtendedDropdownElement);
 ConfigurablePanel.addConfigurableElement(HeadingElement);
 ConfigurablePanel.addConfigurableElement(HTMLDisplayElement);
 ConfigurablePanel.addConfigurableElement(InvisibleElement);
 ConfigurablePanel.addConfigurableElement(ListElement);
 ConfigurablePanel.addConfigurableElement(PanelElement);
 ConfigurablePanel.addConfigurableElement(RadioGroupElement);
+ConfigurablePanel.addConfigurableElement(SliderElement);
 ConfigurablePanel.addConfigurableElement(SpacerElement);
 ConfigurablePanel.addConfigurableElement(SubmitElement);
 ConfigurablePanel.addConfigurableElement(TextareaElement);
 ConfigurablePanel.addConfigurableElement(TextFieldElement);
+
+ConfigurablePanel.addConfigurableElement(HoriontalLayout);
+ConfigurablePanel.addConfigurableElement(ShowHideLayout);
 
 
 
@@ -32217,7 +33236,8 @@ var apogeeUiLib = /*#__PURE__*/Object.freeze({
     TreeControl: TreeControl,
     TreeEntry: TreeEntry,
     DisplayAndHeader: DisplayAndHeader,
-    ConfigurablePanel: ConfigurablePanel
+    ConfigurablePanel: ConfigurablePanel,
+    getFormResultFunctionBody: getFormResultFunctionBody
 });
 
 function createCommonjsModule$1(fn, module) {
@@ -53465,7 +54485,7 @@ let lineFunctions = {
         for(var i = 0; i < lineDef.entries.length; i++) {
             var entry = lineDef.entries[i];
             let label, value;
-            if(apogeeutil$1.getObjectType(entry) == "Array") {
+            if(Array.isArray(entry)) {
                 value = entry[0];
                 label = entry[1];
             }
@@ -55466,7 +56486,10 @@ class ApogeeView {
                 SplitPane.SCROLLING_PANE,
                 SplitPane.FIXED_PANE
             );
-        mainContainer.getBody().appendChild(this.splitPane.getOuterElement());
+        let contentOutsideMenuBar = this.splitPane.getOuterElement();
+        //adding this class puts the content at lower z-index than menu bar.
+        contentOutsideMenuBar.classList.add("content_outside_menu_bar");
+        mainContainer.getBody().appendChild(contentOutsideMenuBar);
 
         //---------------------
         //load the tree pane
@@ -55853,6 +56876,10 @@ class WebDisplayContainer {
         return this.componentView;
     }
 
+    getDataDisplay() {
+        return this.dataDisplay;
+    }
+
     //-------------------
     // state management
     //-------------------
@@ -56022,17 +57049,22 @@ class WebDisplayContainer {
     /** This method is called when the member is updated, to make sure the 
     * data display is up to date. */
    componentUpdated(component) {
-        //update the data display
-        if((this.dataDisplay)&&(!this.inEditMode)) {
-            let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
-            if(reloadDataDisplay) {
-                this.reloadDisplay();
-            }
-            else if(reloadData) {
+    //update the data display
+    if(this.dataDisplay) {
+        let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
+        if(reloadDataDisplay) {
+            //this will also reload data
+            this.reloadDisplay();
+        }
+        else if(reloadData) {
+            //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
+            if(!this.inEditMode) {
                 this.dataDisplay.showData();
+                this.updateViewSizeButtons();
             }
         }
     }
+}
         
     //------------------------------
     // Accessed by the Editor, if applicable
@@ -56141,6 +57173,15 @@ class WebComponentDisplay {
 
     getComponentView() {
         return this.componentView;
+    }
+
+    getDataDisplay(viewType) {
+        if((viewType == this.activeView)&&(this.displayContainer)) {
+            return this.displayContainer.getDataDisplay();
+        }
+        else {
+            return null;
+        }
     }
 
     componentUpdated(component) {
@@ -57102,6 +58143,17 @@ class ComponentView {
         return this.childComponentDisplay;
     }
 
+    /** This gets the data display instance that is currently loaded in the display. It returns null 
+     * if the data display is not loaded. */
+    getCurrentDataDisplayInstance(viewType) {
+        if(this.childComponentDisplay) {
+            return this.childComponentDisplay.getDataDisplay(viewType);
+        }
+        else {
+            return null;
+        }
+    }
+
     closeComponentDisplay() {
         if(this.childComponentDisplay) {
             //first store the window state
@@ -57348,7 +58400,6 @@ class DataDisplay {
         this.editOk = false;
 
         //defaults for container sizing logic
-        this.supressContainerHorizontalScroll = false;
         this.useContainerHeightUi = false;
     }
 
@@ -57438,17 +58489,6 @@ class DataDisplay {
     // The display has controls for the user to resize the display. These use the 
     // following API to interact with the display
     //----------------------------
-
-    /** This function is called to see if the container should provide horizontal scroll bars for the display view content. */
-    getSupressContainerHorizontalScroll() {
-        return this.supressContainerHorizontalScroll;
-    }
-
-    /** This sets the variable that determines if the container will provide a horizontal scroll bars for the display view
-     * content. The default value is false. */
-    setSupressContainerHorizontalScroll(supressContainerHorizontalScroll) {
-        this.supressContainerHorizontalScroll = supressContainerHorizontalScroll;
-    }
 
     /** This function is called to see if the container should provide a view height UI, if the container supports it. */
     getUseContainerHeightUi() {
@@ -57611,7 +58651,6 @@ class AceTextEditor extends DataDisplay {
         this.editorOptions.minLines = DEFAULT_MIN_LINES;
 
         //set variables for internal display view sizing
-        this.setSupressContainerHorizontalScroll(true);
         this.setUseContainerHeightUi(true);
     }
     
@@ -57664,7 +58703,7 @@ class AceTextEditor extends DataDisplay {
         }
 
         //check data is valid
-        if(apogeeutil$1.getObjectType(text) != "String") {
+        if(!apogeeutil$1.isString(text)) {
             var errorMsg = "ERROR: Data value is not text";
             //this.setError(errorMsg);
             text = errorMsg;
@@ -57874,12 +58913,20 @@ class ConfigurableFormEditor extends DataDisplay {
      */
     constructor(displayContainer,dataSource) {
         super(displayContainer,dataSource);
+
+        //TEMP - to raise the z index
+        let domElement = this.displayContainer.getDisplayElement();
+        if(domElement) {
+            domElement.style.zIndex = 2;
+        }
         
         //construct the display
         this.panel = new ConfigurablePanel();
         if(dataSource.getDisplayData) {
             this.panel.configureForm(dataSource.getDisplayData());
         }
+
+        this.panel.addOnInput( formValue => this.onFormInput(formValue));
     }
 
     /** This method will return undefined until showData is called. */
@@ -57893,6 +58940,11 @@ class ConfigurableFormEditor extends DataDisplay {
         this.changeReferenceValue = this.panel.getValue();
         return this.changeReferenceValue;
     }
+
+    /** This returns the form meta value. */
+    getFormMeta() {
+        return this.panel.getMeta();
+    }
     
     /** This is passed the data form the data callback, which should be the extended data  - including layout + value */
     setData(data) {
@@ -57901,28 +58953,26 @@ class ConfigurableFormEditor extends DataDisplay {
             data = {};
         }
 
-        this.changeReferenceValue = data;
+        this.changeReferenceFormValue = data;
 
         //input data is the layout and the value
         this.panel.setValue(data);
-        
+    }
+
+    onFormInput(formValue) {
         //set change to enable save bar is form value differs from initial data
         let dataSource = this.getDataSource();
-        if((dataSource.getEditOk)&&(dataSource.getEditOk())) {
-            var onChange = (currentFormValue,form) => {
-                if(apogeeutil$1.jsonEquals(currentFormValue,this.changeReferenceValue)) {
-                    this.endEditMode();
-                }
-                else {
-                    this.startEditMode();
-                }
-            };
-            this.panel.addOnChange(onChange);
-        }     
+        let editOk = (dataSource.getEditOk)&&(dataSource.getEditOk()); 
+        if(editOk) {
+            if(!apogeeutil$1.jsonEquals(formValue,this.changeReferenceFormValue)) {
+                
+                this.startEditMode();
+            }
+        }
     }
 
     //===========================
-    // Utilities for special form layouts
+    // Utilities for forms
     //===========================
 
     static getErrorLayout(errorMsg) {
@@ -59666,7 +60716,7 @@ var versions = process$2 && process$2.versions;
 var v8 = versions && versions.v8 || '';
 var $Promise = _global[PROMISE];
 var isNode$1 = _classof(process$2) == 'process';
-var empty$2 = function () { /* empty */ };
+var empty$1 = function () { /* empty */ };
 var Internal, newGenericPromiseCapability, OwnPromiseCapability, Wrapper;
 var newPromiseCapability = newGenericPromiseCapability = _newPromiseCapability.f;
 
@@ -59675,11 +60725,11 @@ var USE_NATIVE = !!function () {
     // correct subclassing with @@species support
     var promise = $Promise.resolve(1);
     var FakePromise = (promise.constructor = {})[_wks('species')] = function (exec) {
-      exec(empty$2, empty$2);
+      exec(empty$1, empty$1);
     };
     // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
     return (isNode$1 || typeof PromiseRejectionEvent == 'function')
-      && promise.then(empty$2) instanceof FakePromise
+      && promise.then(empty$1) instanceof FakePromise
       // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
       // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
       // we can't detect it synchronously, so just check versions
@@ -59885,7 +60935,7 @@ _export(_export.S + _export.F * ( !USE_NATIVE), PROMISE, {
   }
 });
 _export(_export.S + _export.F * !(USE_NATIVE && _iterDetect(function (iter) {
-  $Promise.all(iter)['catch'](empty$2);
+  $Promise.all(iter)['catch'](empty$1);
 })), PROMISE, {
   // 25.4.4.1 Promise.all(iterable)
   all: function all(iterable) {
@@ -117328,7 +118378,6 @@ class HandsonGridEditor extends DataDisplay {
         };
 
         //set variables for internal display view sizing
-        this.setSupressContainerHorizontalScroll(true);
         this.setUseContainerHeightUi(true);
 
         //we will use a listener to see when the page is resized
@@ -117646,6 +118695,8 @@ class UiCommandMessenger {
         command.type = "saveMemberData";
         command.memberId = this._getLocalMemberId(updateMemberName);
         command.data = data;
+
+        //if the member is not found we will error out with this command
         return this.app.executeCommand(command);
     }
     
@@ -117678,7 +118729,13 @@ class UiCommandMessenger {
 
         var pathArray = localMemberName.split(".");
         var member = contextManager.getMember(model,pathArray);
-        return member.getId();
+        if(member) {
+            return member.getId();
+        }
+        else {
+            console.error("Member not found: " + pathArray.join("."));
+            return null;
+        }
     }
 
     
@@ -118445,7 +119502,7 @@ function exitEmptyList(state, dispatch) {
 // :: (EditorState, ?(tr: Transaction)) → bool
 // If we are in a top level list at the start of the line, this will convert the line to a paragraph type block
 function exitFromStartOfList(state, dispatch) {
-    let { $head } = state.selection;
+    let { $head, empty } = state.selection;
     let schema = state.schema;
     if((empty)&&($head.parent.type == schema.nodes.listItem)&&($head.parentOffset == 0)) {
         return setBlockType(schema.nodes.paragraph, state, dispatch);
@@ -120432,6 +121489,10 @@ class PageDisplayContainer {
         return this.componentView;
     }
 
+    getDataDisplay() {
+        return this.dataDisplay;
+    }
+
     //-------------------
     // state management
     //-------------------
@@ -120565,9 +121626,7 @@ class PageDisplayContainer {
         this.headerContainer = uiutil.createElementWithClass("div","visiui_displayContainer_headerContainerClass",this.mainElement);
         
         //add the view container
-        let viewContainerClass = this.dataDisplay.getSupressContainerHorizontalScroll() ? 
-            "visiui_displayContainer_viewContainerClass_noHScroll" : "visiui_displayContainer_viewContainerClass";
-        this.viewContainer = uiutil.createElementWithClass("div",viewContainerClass,this.mainElement);
+        this.viewContainer = uiutil.createElementWithClass("div","visiui_displayContainer_viewContainerClass",this.mainElement);
 
         this.uiCompleted = true;
     }
@@ -120786,14 +121845,18 @@ class PageDisplayContainer {
     * data display is up to date. */
     componentUpdated(component) {
         //update the data display
-        if((this.dataDisplay)&&(!this.inEditMode)) {
+        if(this.dataDisplay) {
             let {reloadData,reloadDataDisplay} = this.dataDisplay.doUpdate();
             if(reloadDataDisplay) {
+                //this will also reload data
                 this.reloadDisplay();
             }
             else if(reloadData) {
-                this.dataDisplay.showData();
-                this.updateViewSizeButtons();
+                //don't reload data if we are in edit mode. It will reload after completion, whether through cancel or save.
+                if(!this.inEditMode) {
+                    this.dataDisplay.showData();
+                    this.updateViewSizeButtons();
+                }
             }
         }
     }
@@ -120929,6 +121992,20 @@ class PageChildComponentDisplay {
 
     getComponentView() {
         return this.componentView;
+    }
+
+    getPageDisplayContainer(viewType) {
+        return this.displayContainerMap[viewType];
+    }
+
+    getDataDisplay(viewType) {
+        let pageDisplayContainer = this.getPageDisplayContainer(viewType);
+        if(pageDisplayContainer) {
+            return pageDisplayContainer.getDataDisplay();
+        }
+        else {
+            return null;
+        }
     }
 
     // getMember() {
@@ -121511,7 +122588,7 @@ class LiteratePageComponentDisplay$1 {
     /** This is used to select the end of the document if the page is clicked below the document end. */
     onClickContentElement(event) {
         if(event.target == this.contentElement) {
-            //this.componentView.giveEditorFocusIfShowing();
+            this.componentView.giveEditorFocusIfShowing();
             let command = this.componentView.getSelectEndOfDocumentCommand();
             let app = this.componentView.getModelView().getApp();
             app.executeCommand(command);

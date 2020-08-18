@@ -40,6 +40,7 @@ input[type=text] focus {
 .menu_bar {
     background-color: rgb(220,220,240);
     position:relative;
+    z-index: 1
 }
 .menu_bar_left {
     /* fixed */
@@ -50,6 +51,9 @@ input[type=text] focus {
     /* fixed */
     float:right;
     display:inline;
+}
+.content_outside_menu_bar {
+    z-index: 0;
 }
 .tab-icon-display {
     /* fixed */
@@ -87,6 +91,7 @@ input[type=text] focus {
     padding: 2px;
     background-color: rgb(247,247,249);
     font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
+    z-index: 1;
 }
 .visiui_litPage_componentToolbar {
     border-right: 1px solid #ccc;
@@ -96,6 +101,7 @@ input[type=text] focus {
     font-family: 'Helvitica Neue', 'Helvitica', 'Ariel', sans-serif;
     padding: 2px;
     background-color: rgb(247,247,249);
+    z-index: 1;
 }
 .visiui_litPage_body {
     position: absolute;
@@ -105,6 +111,7 @@ input[type=text] focus {
     right: 0px;
     overflow-y: auto;
     overflow-x: hidden;
+    z-index: 0;
 }
 .visiui_litPage_componentButton {
     position:relative;
@@ -230,15 +237,10 @@ input[type=text] focus {
 .visiui_displayContainer_viewContainerClass {
     position: relative;
     margin: 3px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    /*outline: .5px solid rgb(200,200,200);*/
-}
-.visiui_displayContainer_viewContainerClass_noHScroll {
-    position: relative;
-    margin: 3px;
+    overflow-y: visible;
     overflow-x: hidden;
-    overfow-y: = hidden;
+    z-index: 0;
+    /*outline: .5px solid rgb(200,200,200);*/
 }
 
 .atb_toolbar {
@@ -618,14 +620,13 @@ input[type=text] focus {
     padding:2px;
     margin:0px;
 }
-.visiui-menu-text:hover {
+.visiui-menu-label:hover {
     background-color:rgb(211,211,164);
+    outline: 3px solid rgb(211,211,164);
 }
-.visiui-menu-image:hover {
+.visiui-menu-label:active {
     background-color:rgb(211,211,164);
-}
-.visiui-menu-heading:active {
-    background-color:rgb(211,211,164);
+    outline: 3px solid rgb(211,211,164);
 }
 
 
@@ -661,19 +662,22 @@ input[type=text] focus {
 .visiui-sp-left {
     width:20%;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
+    z-index: 1;
 }
 .visiui-sp-divider {
     width:5px;
     height:100%;
     background-color: rgb(220,220,240);
     cursor: ew-resize;
+    z-index: 0;
 }
 .visiui-sp-right {
     height:100%;
-    overflow: hidden;
+    overflow: visible;
     margin: 0px;
     padding: 0px;
+    z-index: 1;
 }
 .visiui-sp-inner {
     position: relative;
@@ -878,6 +882,15 @@ input[type=text] focus {
 }
 
 
+.apogee_configurablePanelBody { 
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+.apogee_configurablePanelBody_scroll { 
+    position: relative;
+    overflow: auto; /** note!!! - browsers do not do x auto/scroll and y visible */
+}
 .apogee_configurablePanelBody_fillParent { 
     position: absolute;
     top: 0px;
@@ -885,25 +898,31 @@ input[type=text] focus {
     bottom: 0px;
     right: 0px;
 }
-.apogee_configurablePanelBody_selfSized { 
+.apogee_configurablePanelLine {
     position: relative;
-    overflow: auto;
 }
-.apogee_configurablePanelLine_standard {
-    position: relative;
-    padding:5px;
-    margin:0px;
+.apogee_configurablePanelHeading_1 {
+    font-size: 2em;
+    font-weight: bold;
 }
-.apogee_configurablePanelPanelLine_noMaring {
-    position: relative;
-    padding:0px;
-    margin:0px;
+.apogee_configurablePanelHeading_2 {
+    font-size: 1.5em;
+    font-weight: bold;
 }
-.apogee_configurablePanelPanelLine_hidden {
-    position: relative;
-    display: none;
+.apogee_configurablePanelHeading_3 {
+    font-size: 1.17em;
+    font-weight: bold;
 }
-.apogee_configurablePanelHeading {
+.apogee_configurablePanelHeading_4 {
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_5 {
+    font-size: .83em;
+    font-weight: bold;
+}
+.apogee_configurablePanelHeading_6 {
+    font-size: .67em;
+    font-weight: bold;
 }
 .apogee_configurablePanelLabel {
     font-weight: bold;
@@ -912,6 +931,66 @@ input[type=text] focus {
 .apogee_configurablePanelButton {
     margin-left:20px;
     margin-right:20px;
+}
+.apogee_configurableShowHideBody {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: 20px;
+}
+.apogee_configurableShowHideHeadingLine {
+    position: relative;
+    display: block;
+    padding: 4px;
+    margin: 0;
+}
+.apogee_configurableShowHideControl {
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+.apogee_configurableExtendedDropdown {
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+}
+.apogee_configurableExtendedHeadLink {
+    position: relative;
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    z-index: 5;
+}
+.apogee_configurableExtendedBodyContainer {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.apogee_configurableExtendedBodyElement {
+    display: inline-block;
+    padding: 3px;
+    margin: 0px;
+    z-index: 500;
+}
+.apogee_configurableExtendedOpened {
+    display: block;
+}
+.apogee_configurableExtendedShield {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    
 }
 /** Obverall container. Width, height tbd */
 .listElement_listContainer {
