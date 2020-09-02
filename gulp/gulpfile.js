@@ -16,8 +16,10 @@ const RELEASE_FILES = [
     "../src/**/*",
     "!../src/**/node_modules",
     "!../src/**/node_modules/**/*",
+    "!../src/apogee.html",
     "!../src/package.json",
     "!../src/package-lock.json",
+    "temp/apogee.html",
     "temp/package.json",
     "temp/package-lock.json",
     "../license"
@@ -45,6 +47,12 @@ function updatePackageLockFileVersion() {
         .pipe(dest(TEMP_FOLDER));
 }
 
+function updateHtmlPageTask() {
+    return src('../src/apogee.html')
+        .pipe(replace("APOGEE_VERSION",versionConfig.VERSION_NUMBER))
+        .pipe(dest(TEMP_FOLDER));
+}
+
 function createReleaseZip() {
     return src(RELEASE_FILES)
         .pipe(zip(ZIP_FILE_NAME))
@@ -61,6 +69,7 @@ let release = series(
     () => cleanFolderTask(TEMP_FOLDER),
     updatePackageFileVersion,
     updatePackageLockFileVersion,
+    updateHtmlPageTask,
     createReleaseZip,
     () => cleanFolderTask(TEMP_FOLDER)
 );
