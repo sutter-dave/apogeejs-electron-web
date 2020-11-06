@@ -10,13 +10,13 @@ body {
     font-family: sans-serif;
     font-size: 14px;
 
-    -webkit-user-select: none;
+    /*-webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none;
+    user-select: none;*/
 }
-textarea focus {
+/* textarea focus {
     -webkit-user-select: text;
     -khtml-user-select: text;
     -moz-user-select: text;
@@ -29,7 +29,7 @@ input[type=text] focus {
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
-}
+}*/
 #appContainer {
     position:absolute;
     left:0;
@@ -85,11 +85,12 @@ input[type=text] focus {
     background-color: rgba(255,255,255,0);
   }
   /* Needed for Safari */
+  /*
   [contenteditable] {
     -webkit-user-select: text;
     user-select: text;
 }
-
+*/
 .visiui_litPage_header {
     
 }
@@ -164,6 +165,9 @@ input[type=text] focus {
     margin-top: 5px;
     margin-bottom: 5px;
 }
+.visiui_hideSelection::selection {
+    background: transparent;
+}
 .visiui_pageChild_highlighted {
     background-color: rgb(215, 222, 243);
 }
@@ -185,6 +189,14 @@ input[type=text] focus {
     font-size: larger;
     color:darkblue;
 }
+.visiui_pageChild_cellTypeLabelClass {
+    display: inline;
+    padding-left: 25px;
+    vertical-align: middle;
+    font-size: smaller;
+    color: gray;
+    user-select: none;
+}
 .visiui-pageChild-icon-container {
     display:inline-block;
     position: relative;
@@ -203,11 +215,13 @@ input[type=text] focus {
     margin: 0px;
     height: 16px;
     width: 16px;
+    user-select: none;
 }
 .visiui_pageChild_icon_overlay {
     position: absolute;
     top: 0px;
     left: 0px;
+    user-select: none;
 }
 .visiui_pageChild_titleBarViewsClass {
     display: inline;
@@ -233,6 +247,7 @@ input[type=text] focus {
     font-size: smaller;
     color:rgb(0,0,0);
     font-weight: bold;
+    user-select: none;
 }
 
 
@@ -250,6 +265,7 @@ input[type=text] focus {
 .visiui_displayContainer_viewSelectorLinkClass {
     text-decoration:none;
     display: inline;
+    user-select: none;
 }
 .visiui_displayContainer_viewActiveElementClass {
     display: inline;
@@ -264,9 +280,11 @@ input[type=text] focus {
     cursor: pointer;
     vertical-align: middle;
     font-weight: bold;
+    user-select: none;
 }
 .visiui_displayContainer_expandContractClass {
     vertical-align: middle;
+    user-select: none;
 }
 .visiui_displayContainer_headerContainerClass {
     position: relative;
@@ -293,6 +311,7 @@ input[type=text] focus {
     font-size: smaller;
     color:rgb(128,128,128);
     cursor: pointer;
+    user-select: none;
 }
 .visiui_displayContainer_viewDisplaySizeButtonClass:hover {
     background-color: rgba(128,128,144,.35);
@@ -680,7 +699,6 @@ input[type=text] focus {
 
     overflow: visible;
 }
-
 .visiui-menu-heading {
     display:inline-block;
     position:relative;
@@ -694,6 +712,12 @@ input[type=text] focus {
 .visiui-menu-heading-active {
     background-color:rgba(128,128,144,.35);
     outline: 3px solid rgba(128,128,144,.35);
+}
+.visiui-menu-label {
+    user-select: none;
+}
+.visiui-menu-label::selection {
+    background: transparent;
 }
 .visiui-menu-label:hover {
     background-color:rgba(128,128,144,.35);
@@ -1019,29 +1043,38 @@ input[type=text] focus {
 .apogee_configurablePanelHeading_1 {
     font-size: 2em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_2 {
     font-size: 1.5em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_3 {
     font-size: 1.17em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_4 {
     font-weight: bold;
+    user-select: none;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_5 {
     font-size: .83em;
     font-weight: bold;
+    user-select: none;
+    user-select: none;
 }
 .apogee_configurablePanelHeading_6 {
     font-size: .67em;
     font-weight: bold;
+    user-select: none;
 }
 .apogee_configurablePanelLabel {
     font-weight: bold;
     vertical-align: middle; 
+    user-select: none;
 }
 .apogee_configurablePanelHint {
     font-style: italic;
@@ -1050,6 +1083,7 @@ input[type=text] focus {
     vertical-align: middle; 
     margin-right: 3px;
     margin-left: 3px;
+    user-select: none;
 }
 .apogee_configurablePanelButton {
     margin-left:20px;
@@ -1127,6 +1161,10 @@ input[type=text] focus {
 }
 .apogee_configubleElementErrorDiv {
     color: red;
+    user-select: none;
+}
+.apogee_configurableElement_hideSelection::selection {
+    background: transparent;
 }
 /** Obverall container. Width, height tbd */
 .listElement_listContainer {
@@ -1212,6 +1250,10 @@ button for each type of entry allowed. The label will indicate the associated ty
     border: 1px solid darkblue;
     text-align: center;
     z-index: 100;
+    user-select: none;
+}
+.apogee_tooltip_help_image {
+    user-select: none;
 }
 .apogee_tooltip_element:hover .apogee_tooltip_text {
     visibility: visible;
