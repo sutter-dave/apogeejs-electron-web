@@ -433,180 +433,26 @@ input[type=text] focus {
     font-style: italic;
 }
 
-/* These are default window colors. User can set alternate colors. */
-/* The default values are ugly for now to make sure people set them for the app. */
-.visiui_win_titleBarClass {
-	background-color: rgb(185,185,220);
-    padding:0px;
-}
-.visiui_win_windowColorClass {
-    background-color: rgb(185,185,220);
-}
-
-/* These elements should not be overridden */ 
-.visiui_win_headerCell {
-}
-.visiui_win_bodyCell {
-  background-color: rgb(240,240,240);
-  /*display set in javascript*/
-  /* - normal, max - emtpy string */
-  /* - min - none */
-}
-.visiui_win_body {
-	display:block;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    position:absolute;
-    overflow:hidden;
-
-	background-color:white;
-}
-.visiui_win_headerCell {
-}
-.visiui_win_header {
-}
-
-
-.visiui_win_main {
-  border-collapse: collapse;
-  position: absolute;
-  /*top, left, height, width set in javascript*/
-  /* - normal - all values set */
-  /* - min - height and width set to empty string */
-  /* - max - height and width set to 100% */
-  background-color: rgb(240,240,240);
-  outline: 1px solid rgb(150,150,190);
-}
-.visiui_win_main td {
-  position: relative;
-  padding: 0px;
-}
-.visiui_win_main tr {
-  position: relative;
-}
-
-.visiui_win_headerCell {
-}
-.visiui_win_headerRow {
-    z-index: -1; /* this is for a mouse resize event issue in firefox */
-}
-.visiui_win_bannerRow {
-    z-index: -1; /* this is for a mouse resize event issue in firefox */
-}
-.visiui_win_bodyRow {
-  height: 100%;
-  z-index: -1; /* this is for a mouse resize event issue in firefox */
-}
-.visiui_win_topLeft {
-  cursor: nw-resize;
-}
-.visiui_win_top {
-  height: 5px;
-  min-height: 5px;
-  cursor: ns-resize;
-}
-.visiui_win_topRight {
-  cursor: ne-resize;
-}
-.visiui_win_left {
-  width: 5px;
-  min-width: 5px;
-  cursor: ew-resize;
-}
-.visiui_win_right {
-  width: 5px;
-  min-width: 5px;
-  cursor: ew-resize;
-}
-.visiui_win_bottomLeft {
-  cursor: sw-resize;
-}
-.visiui_win_bottom {
-  height: 5px;
-  min-height: 5px;
-  cursor: ns-resize;
-}
-.visiui_win_bottomRight {
-  cursor: se-resize;
-}
-
-
-.visiui_win_left_style {
-    /* fixed */
-    display:inline;
-    width:100%;
-}
-
-.visiui_win_right_style {
-    /* fixed */
-    float:right;
-    display:inline;
-}
-
-.visiui_win_title {
-    /* fixed */
-    display:inline-block;
-    cursor:default;
-    font-weight:bold;
-    color:darkblue;
-    vertical-align: top;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
-.visiui_win_menu_style {
-    /* fixed */
-    display:inline-block;
-    position: relative;
-
-    /* configurable */
-    margin-right:3px;
-}
-.visiui_win_icon_overlay_style {
+.visiui_dialog_main {
     position: absolute;
-    top: 0px;
-    left: 0px;
-}
-.visiui_win_cmd_button { 
-    /* fixed */
-    display:inline-block;
-
-    /* configurable */
-    margin-right:3px;
-}
-
-.visiui_win_tool_style {
-    /* fixed */
-    display:inline-block;
-
-    /* configurable */
-    margin-right:3px;
-}
-
-.visiui_win_container_fixed {
-    position:absolute;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
+    display: inline-block;
+    padding: 4px;
+    background-color: rgb(185,185,220);
+    outline: 1px solid rgb(150,150,190);
+  }
+  .visiui_dialog_header {
+    display:block;
+    position:relative;
+    height: 16px;
+    background-color: rgb(185,185,220);
+    cursor: move;
+  }
+  .visiui_dialog_body {
+    display:block;
+    position:relative;
     overflow:hidden;
-}
-
-.visiui_win_container_scrolling {
-	position:absolute;
-    top:0px;
-    left:0px;
-    bottom:0px;
-    right:0px;
-    overflow:auto;
-}
-
-.visiui_win_container_fit_content {
-	position:relative;
-}
- 
+      background-color: rgb(240,240,240);
+  }
 
 .dialogBody { 
 }
@@ -1263,6 +1109,328 @@ button for each type of entry allowed. The label will indicate the associated ty
     background-color: rgba(128,128,144,.35);
 }
 
+.combinedFileAccess_mainContainer {
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    border-collapse: collapse;
+}
+
+.combinedFileAccess_selectedSource {
+    position: relative;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.combinedFileAccess_selectHeading {
+    position: relative;
+    overflow: hidden;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 14px;
+}
+
+.combinedFileAccess_dialogTitleElement {
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    font-size: 24px;
+}
+
+.combinedFileAccess_sourceCell {
+    position: relative;
+    vertical-align: top;
+    padding: 10px;
+    border-right: 1px solid gray;
+}
+
+.combinedFileAccess_selectList {
+    position: relative;
+    overflow: auto;
+    outline: 1px solid rgb(128,128,128);
+}
+
+.combinedFileAccess_actionElement {
+    position: relative;
+    overflow: hidden;
+    overflow: hidden;
+}
+
+
+.combinedFileAccess_selectionWrapper {
+    position: relative;
+    padding: 10px 5px;
+    outline: 1px solid rgb(128,128,128);
+}
+
+.combinedFileAccess_selectionWrapper:hover {
+    background-color: rgb(200,200,200);
+}
+
+.combinedFileAccess_selectionWrapperActive {
+    background-color: white;
+}
+
+.combinedFileAccess_selectionTitleWrapper {
+    position: relative;
+}
+
+.combinedFileAccess_selectionTitle {
+    font-weight: bold;
+    color: rgb(96,96,96);
+}
+
+.combinedFileAccess_selectionIcon {
+    height: 16px;
+    width: 16px;
+}
+
+.combinedFileAccess_selectionConfigWrapper {
+    position: relative;
+}
+
+/* remote file access config entry */
+
+.remoteFileAccess_configContainer {
+
+}
+.remoteFileAccess_userElement {
+
+}
+.remoteFileAccess_loginoutContainer {
+    text-align: right;
+}
+.remoteFileAccess_loginElement {
+    font-size: smaller;
+    color: rgb(64,64,64);
+    text-decoration: underline;
+}
+.remoteFileAccess_loginElement:hover {
+    background-color: rgba(128,128,144,.35);
+
+}
+.remoteFileAccess_logoutElement {
+    font-size: smaller;
+    color: rgb(64,64,64);
+    text-decoration: underline;
+}
+.remoteFileAccess_logoutElement:hover {
+    background-color: rgba(128,128,144,.35);
+}
+
+.remoteFileAccess_accountMsgElement {
+
+}
+
+/* remote file access action entry */
+
+.remoteFileAccess_mainContainer {
+    padding: 5px;
+    max-width: 650px;
+}
+
+.remoteFileAccess_drivesCell {
+    position: relative;
+    vertical-align: top;
+    padding: 5px;
+}
+
+.remoteFileAccess_driveTitle {
+    padding: 5px;
+}
+
+.remoteFileAccess_driveList {
+    position: relative;
+    overflow: auto;
+    outline: 1px solid rgb(128,128,128);
+    min-height: 10px;
+    margin: 5px;
+}
+
+.remoteFileAccess_driveElement {
+    position: relative;
+    outline: 1px solid rgb(128,128,128);
+    padding: 10px 5px;
+}
+
+.remoteFileAccess_driveElement:hover {
+    background-color: rgb(200,200,200);
+}
+
+.remoteFileAccess_driveElementActive {
+    background-color: white;
+}
+
+.remoteFileAccess_pathCell {
+    padding: 5px;
+}
+
+.remoteFileAccess_pathElement {
+    display: inline;
+    word-break: break-all;
+}
+
+.remoteFileAccess_commandElement {
+    display: inline;
+    padding-left: 15px;
+}
+
+.remoteFileAccess_fileListCell {
+    padding: 5px;
+    margin: 5px;
+    vertical-align: top;
+    overflow: auto;
+    height: 300px;
+    width: 500px;
+    background-color: white;
+    border: 1px solid gray;
+}
+
+.remoteFileAccess_filterCell {
+    padding: 5px;
+}
+
+.remoteFileAccess_fileNameCell {
+    padding: 5px;
+}
+
+.remoteFileAccess_fileNameLabel {
+    margin-right: 5px
+}
+
+.remoteFileAccess_saveFileNameField {
+    width: 300px;
+}
+
+.remoteFileAccess_buttonsCell {
+    padding: 5px;
+}
+
+.remoteFileAccess_submitButton {
+    margin-left: 50%;
+}
+
+.remoteFileAccess_cancelButton {
+    float: right;
+    margin-right: 50px;
+}
+
+.remoteFileAccess_pathFileElement {
+    padding: 5px;
+    font-size: 14px;
+    color: black;
+    word-break: keep-all;
+}
+
+.remoteFileAccess_pathDelimiterElement {
+    padding: 5px;
+    font-size: 14px;
+    color: gray;
+    font-weight: bold;
+}
+
+.remoteFileAccess_pathDriveElement {
+    padding: 5px;
+    font-size: 14px;
+    color: gray;
+    font-weight: bold;
+    word-break: keep-all;
+}
+
+.remoteFileAccess_folderCommandButton {
+    padding: 2px;
+    border: none;
+    margin: 2px;
+    border: 1px solid rgba(128,128,144,0);
+}
+.remoteFileAccess_folderCommandButton:hover {
+    background-color: rgba(128,128,144,.35);
+    border: 1px solid rgb(64,64,64);
+}
+
+.remoteFileAccess_fileListTable {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.remoteFileAccess_fileRow {
+    padding: 2px;
+}
+
+.remoteFileAccess_fileRow:hover {
+    background-color: rgb(240,240,256);
+}
+
+.remoteFileAccess_fileRowActive {
+    background-color: rgb(220,220,256);
+}
+
+.remoteFileAccess_fileRowActive:hover {
+    background-color: rgb(220,220,256);
+}
+
+.remoteFileAccess_fileIconCell {
+
+}
+.remoteFileAccess_fileNameCell {
+    min-width: 100px;
+}
+.remoteFileAccess_fileLinkFolder {
+    padding: 2px;
+    text-decoration: underline;
+}
+.remoteFileAccess_fileLinkFolder:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.remoteFileAccess_fileLinkFileOpen {
+    padding: 2px;
+    text-decoration: underline;
+}
+.remoteFileAccess_fileLinkFileOpen:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.remoteFileAccess_fileLinkFileSave {
+    padding: 2px;
+}
+.remoteFileAccess_fileLinkFileSave:hover {
+    background-color: rgba(128,128,144,.35);
+}
+.remoteFileAccess_fileMimeCell {
+    min-width: 100px;
+}
+.remoteFileAccess_fileCmdCell {
+}
+.remoteFileAccess_renameButton {
+    font-size: smaller;
+    background-color: white;
+    border: 1px solid lightgray;
+    margin: 2px;
+}
+.remoteFileAccess_deleteButton {
+    font-size: smaller;
+    background-color: white;
+    color: red;
+    border: 1px solid lightgray;
+    margin: 2px;
+}
+.remoteFileAccess_filterCheckboxLabel {
+    padding-right: 7px;
+}
+
+.remoteFileAccess_loggedOutShield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(200,200,200,.75);
+    text-align: center;
+    padding: 45% 0;
+}
+
+.remoteFileAccess_loggedOutCancelButton {
+    margin: 10px;
+}
 .ProseMirror {
   position: relative;
 }
