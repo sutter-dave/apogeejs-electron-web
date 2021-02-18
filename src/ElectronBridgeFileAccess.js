@@ -1,18 +1,13 @@
-import {apogeeapp} from "./lib/apogeeAppBundle.es.js";
-const BaseFileAccess = apogeeapp.BaseFileAccess;
-
 /* 
  * This class provides file open and save in electron.
  */
-export default class ElectronBridgeFileAccess extends BaseFileAccess {
+export default class ElectronBridgeFileAccess {
     
     //========================================
     // Public
     //========================================
     
-    constructor() {
-        super();
-    }
+    constructor() {}
     
     /**
      * This method returns fileMetadata appropriate for a new workspace.
