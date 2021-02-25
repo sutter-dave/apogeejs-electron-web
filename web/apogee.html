@@ -4,24 +4,24 @@
 		<title>Apogee</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<script type="text/javascript" src="lib/webGlobals.js"></script>
-        <script type="text/javascript" src="lib/debugHook.js"></script>
-        <script type="module" src="lib/apogeeAppBundle.js"></script>
+		<script type="text/javascript" src="../src/webGlobals.js"></script>
+        <script type="text/javascript" src="../src/debugHook.js"></script>
+        <script type="module" src="../src/apogeeAppBundle.js"></script>
         <script type="text/javascript">
             const includeBasePathInfo = {
-                "resources": "lib/resources",
-                "aceIncludes": "lib/ace_includes"
+                "resources": "../resources",
+                "aceIncludes": "../ace_includes"
             };
 
-            const __apogee_version__ = "APOGEE_VERSION";
+            const __apogee_version__ = "[RELEASE_VERSION]";
             const __browser__ = false;
         </script>
         <script type="module">
-            import ElectronBridgeAppConfigManager from "./ElectronBridgeAppConfigManager.js"
+            import ElectronBridgeAppConfigManager from "../src/ElectronBridgeAppConfigManager.js"
             //create an instance of the app config manager and make it available to this page.
             __globals__.appConfigManager = new ElectronBridgeAppConfigManager();
         </script>
-        <link rel="stylesheet" type="text/css" href="lib/cssBundle.css">
+        <link rel="stylesheet" type="text/css" href="../style/cssBundle.css">
 	</head>
     <body onload="appInit(appConfigManager,includeBasePathInfo)">
         <div id="appContainer"></div>

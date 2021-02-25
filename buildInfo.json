@@ -1,0 +1,60 @@
+{
+    "repoName": "apogeejs-electron-web",
+
+    "npmModule": {
+        "taskList": [
+            {
+                "type": "copyAndReplace",
+                "srcFileUrl": "/apogeejs-electron-web/package.json",
+                "replacementList": [
+                    {
+                        "marker": "[RELEASE_VERSION]",
+                        "name": "RELEASE_VERSION"
+                    }
+                ]
+            },
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-app-bundle/style/cssBundle.css"
+                ],
+                "childFolder": "style"
+            },
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-app-bundle/resources/**/*"
+                ],
+                "childFolder": "resources"
+            },
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-app-bundle/ace_includes/**/*"
+                ],
+                "childFolder": "ace_includes"
+            },
+            {
+                "type": "copyFileList",
+                "srcFileUrlList": [
+                    "/apogeejs-app-bundle/src/debugHook.js",
+                    "/apogeejs-app-bundle/src/webGlobals.js",
+                    "/apogeejs-app-bundle/src/apogeeAppBundle.js",
+                    "/apogeejs-electron-web/src/**/*"
+                ],
+                "childFolder": "src"
+            },
+            {
+                "type": "copyAndReplace",
+                "srcFileUrl": "/apogeejs-electron-web/web/apogee.html",
+                "replacementList": [
+                    {
+                        "marker": "[RELEASE_VERSION]",
+                        "name": "RELEASE_VERSION"
+                    }
+                ],
+                "childFolder": "web"
+            }
+        ]
+    }
+}
