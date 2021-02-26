@@ -9,7 +9,8 @@
                 "replacementList": [
                     {
                         "marker": "[RELEASE_VERSION]",
-                        "libVersion": "this"
+                        "lib": "this",
+                        "type": "version"
                     }
                 ]
             },
@@ -50,7 +51,8 @@
                 "replacementList": [
                     {
                         "marker": "[RELEASE_VERSION]",
-                        "libVersion": "this"
+                        "lib": "this",
+                        "type": "version"
                     }
                 ],
                 "childFolder": "web"
