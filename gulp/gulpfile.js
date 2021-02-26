@@ -93,7 +93,7 @@ const LIB_FILE_NAMES = [
     "ace_includes/**/*",
     "resources/**/*",
     "apogeeAppBundle.es.js",
-    "cssBundle.css",
+    "apogeeAppBundle.css",
     "debugHook.js",
     "versionConfig.json",
     "webGlobals.js"

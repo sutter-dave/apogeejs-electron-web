@@ -2,10 +2,7 @@
     "version": "2.0.0-p1",
     "isProductionRelease": false,
     "buildInfoUrl": "/apogeejs-electron-web/buildInfo.json", 
-    "pathMapping": {
-        "/apogeejs-app-bundle/": "/apogeejs-admin/releases-dev/es/apogeejs-app-bundle/v2.0.0-p1/"
-    },
-    "replacementValues": {
-        "RELEASE_VERSION": "2.0.0-p1"
+    "dependentVersions": {
+        "apogeejs-app-bundle": {"version": "2.0.0-p1", "isProductionRelease": false}
     }
 }
